@@ -96,33 +96,53 @@ document.querySelectorAll('form').forEach(form => {
       });
     } 
     else if (formId === 'friend-form') {
-      webhookData.embeds[0].title = "New Friend Request";
-      webhookData.embeds[0].description = "Someone sent a friend request";
-      webhookData.embeds[0].color = 5763719; // Green color
-      
-      // Add fields for each form input
-      Object.entries(formEntries).forEach(([key, value]) => {
-        webhookData.embeds[0].fields.push({
-          name: key.charAt(0).toUpperCase() + key.slice(1),
-          value: value || "Not provided",
-          inline: true
-        });
-      });
-    } 
-    else if (formId === 'appeal-form') {
-      webhookData.embeds[0].title = "New Ban Appeal";
-      webhookData.embeds[0].description = "Someone submitted a ban appeal";
-      webhookData.embeds[0].color = 15548997; // Red color
-      
-      // Add fields for each form input
-      Object.entries(formEntries).forEach(([key, value]) => {
-        webhookData.embeds[0].fields.push({
-          name: key.charAt(0).toUpperCase() + key.slice(1),
-          value: value || "Not provided",
-          inline: key !== "textarea" // Make textarea full width
-        });
-      });
-    }
+  webhookData.embeds[0].title = "New Friend Request";
+  webhookData.embeds[0].color = 5763719; // Green color
+
+  // Add a detailed description
+  webhookData.embeds[0].description = "**Friend Request Details:**\n";
+
+  Object.entries(formEntries).forEach(([key, value]) => {
+    webhookData.embeds[0].description += `**${key.charAt(0).toUpperCase() + key.slice(1)}:** ${value || "Not provided"}\n`;
+    webhookData.embeds[0].fields.push({
+      name: key.charAt(0).toUpperCase() + key.slice(1),
+      value: value || "Not provided",
+      inline: true
+    });
+  });
+}
+
+else if (formId === 'appeal-form') {
+  // Debug: Log all form entries to see what field names are actually being used
+  console.log("Form entries received:", formEntries);
+  
+  // Try to identify the correct field names based on common naming patterns
+  // These should match EXACTLY how they are named in your HTML form
+  const usernameField = formEntries.username || formEntries.name || formEntries.user || formEntries.discord_name || "Not provided";
+  const discordIdField = formEntries.discordid || formEntries.discord_id || formEntries.id || formEntries.discord || "Not provided";
+  const reasonField = formEntries.reason || formEntries.appeal_reason || formEntries.textarea || formEntries.message || formEntries.description || "Not provided";
+  
+  webhookData.embeds[0].title = "New Ban Appeal";
+  
+  // Add the exact field names we received to the description
+  webhookData.embeds[0].description = "**Ban Appeal Details:**\n";
+  
+  // Add all form fields to the description to ensure we show all data
+  Object.entries(formEntries).forEach(([key, value]) => {
+    webhookData.embeds[0].description += `**${key.charAt(0).toUpperCase() + key.slice(1)}:** ${value || "Not provided"}\n`;
+  });
+  
+  webhookData.embeds[0].color = 15548997; // Red color
+  
+  // Also add fields as before for good measure
+  Object.entries(formEntries).forEach(([key, value]) => {
+    webhookData.embeds[0].fields.push({
+      name: key.charAt(0).toUpperCase() + key.slice(1),
+      value: value || "Not provided",
+      inline: true // Make all fields inline for compact display
+    });
+  });
+}
     
     // Send data to Discord webhook
     const webhookUrl = "https://discord.com/api/webhooks/1371143336135491645/-WshRcFpKQcT4GEo98LCBlSvGldg0_MJrGlz-WSoI8INgo8jEqGk06NWOem_rCziZApr"; // Replace with your actual webhook URL
