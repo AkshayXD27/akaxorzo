@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Akaxorzo</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Poppins:wght@300;400;700&display=swap" rel="stylesheet">
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="top-left">
+    <button class="btn" id="discord-btn"><i class="fab fa-discord"></i>Discord</button>
+    <button class="btn" id="youtube-btn"><i class="fab fa-youtube"></i>YouTube</button>
+  </div>
+  
+  <div class="top-right">
+    <button class="btn" id="events-btn"><i class="far fa-calendar-alt"></i>Events</button>
+    <button class="btn" id="login-btn"><i class="fas fa-sign-in-alt"></i>Login</button>
+    <button class="btn" id="games-btn"><i class="fas fa-gamepad"></i>Games</button>
+  </div>
+  
+  <div class="right-side">
+    <button class="btn" id="appeal-btn"><i class="fas fa-gavel"></i>Ban Appeal</button>
+    <button class="btn" id="friend-btn"><i class="fas fa-user-plus"></i>Friend Request</button>
+  </div>
+  
+  <div class="hero-content">
+    <h1 class="welcome-text">AKAXORZO</h1>
+    <p class="tagline">Join the adventure with exclusive streams, epic gameplay, and an amazing community!</p>
+    <a href="#" class="cta-button" id="subscribe-btn">Subscribe Now</a>
+  </div>
+  
+  <div class="social-icons">
+    <div class="social-icon"><i class="fab fa-twitch"></i></div>
+    <div class="social-icon"><i class="fab fa-twitter"></i></div>
+  </div>
+  
+  <!-- Login Modal -->
+  <div class="modal" id="login-modal">
+    <div class="modal-content">
+      <span class="close-modal">&times;</span>
+      <h2 class="modal-title">Login to Your Account</h2>
+      <form id="login-form">
+        <input type="text" placeholder="Username" required>
+        <input type="password" placeholder="Password" required>
+        <button type="submit">Log In</button>
+      </form>
+      <p style="text-align: center; margin-top: 15px; color: #aaa;">This for admins only </p>
+    </div>
+  </div>
+  
+  <!-- Friend Request Modal -->
+  <div class="modal" id="friend-modal">
+    <div class="modal-content">
+      <span class="close-modal">&times;</span>
+      <h2 class="modal-title">Send Friend Request</h2>
+      <form id="friend-form">
+        <input type="text" placeholder="Your Username" required>
+        <input type="text" placeholder="Your Email" required>
+        <textarea placeholder="Message (Optional)" rows="4"></textarea>
+        <button type="submit">Send Request</button>
+      </form>
+    </div>
+  </div>
+  
+  <!-- Ban Appeal Modal -->
+  <div class="modal" id="appeal-modal">
+    <div class="modal-content">
+      <span class="close-modal">&times;</span>
+      <h2 class="modal-title">Submit Ban Appeal</h2>
+      <form id="appeal-form">
+        <input type="text" placeholder="Your Username" required>
+        <input type="text" placeholder="Discord ID" required>
+        <textarea placeholder="Reason for appeal..." rows="4" required></textarea>
+        <button type="submit">Submit Appeal</button>
+      </form>
+    </div>
+  </div>
+  
+  <!-- Events Modal -->
+  <div class="modal" id="events-modal">
+    <div class="modal-content">
+      <span class="close-modal">&times;</span>
+      <h2 class="modal-title">Upcoming Events</h2>
+      <div style="color: white;">
+        <div style="margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+          <h3 style="color: #9c27b0;">Weekend Stream Marathon</h3>
+          <p style="color: #aaa; margin: 5px 0;">Saturday, May 17 • 2:00 PM EST</p>
+          <p>12-hour stream with special guests and giveaways!</p>
+        </div>
+        <div style="margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+          <h3 style="color: #9c27b0;">Subscriber Tournament</h3>
+          <p style="color: #aaa; margin: 5px 0;">Sunday, May 25 • 4:00 PM EST</p>
+          <p>Join the competition for exclusive prizes and bragging rights!</p>
+        </div>
+        <div>
+          <h3 style="color: #9c27b0;">New Game Release Party</h3>
+          <p style="color: #aaa; margin: 5px 0;">Friday, May 30 • 8:00 PM EST</p>
+          <p>Be the first to see gameplay of the newest release!</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Custom JavaScript -->
+  <script src="script.js"></script>
+</body>
+</html>
