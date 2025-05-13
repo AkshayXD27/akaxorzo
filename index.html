@@ -113,65 +113,58 @@
   <!-- Custom JavaScript -->
   <script src="script.js"></script>
   <script>
-function initSubmissionModalStyles() {
-  // Create a style element for custom styles
-  const styleElement = document.createElement('style');
+// This is a simpler, more targeted JavaScript solution
+// Add this to your script.js file or keep it in your HTML
+
+document.addEventListener('DOMContentLoaded', function() {
+  // Create a style element
+  const style = document.createElement('style');
   
-  // Add CSS rules to change the text color of "Submission" text
-  styleElement.textContent = `
-    /* Target the submission header specifically */
-    .modal-content div:first-child,
-    .modal-content > div:contains("Submission"),
-    .modal-content div:first-of-type,
+  // Add CSS rules that specifically target the "Submission" text
+  style.textContent = `
+    /* Change the color of modal titles */
     .modal-title {
-      color: purple !important; /* Change to your preferred color */
+      color: red !important; /* Change to your desired color */
     }
     
-    /* Make sure our style takes precedence */
-    div.modal-content > *:first-child {
-      color: purple !important; /* Change to your preferred color */
-    }
-    
-    /* If the text is in a button or specific element */
-    .close {
-      color: purple !important; /* For consistency, you might want to style the close button too */
+    /* Change "Submission" text in success messages */
+    .modal-content h2[style*="color: #4CAF50"],
+    .modal-content div:first-child:contains("Submission") {
+      color: red !important; /* Change to your desired color */
     }
   `;
   
-  // Add the style element to the document head
-  document.head.appendChild(styleElement);
+  // Add the style to the document
+  document.head.appendChild(style);
   
-  // For dynamic content that might be added later
-  // Monitor for modal activations
-  const observer = new MutationObserver((mutations) => {
-    mutations.forEach((mutation) => {
-      if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
-        const modal = mutation.target;
-        if (modal.classList.contains('active') && modal.style.display !== 'none') {
-          // Modal was activated, look for the submission text
-          const elements = modal.querySelectorAll('*');
-          elements.forEach(el => {
-            if (el.textContent && el.textContent.includes('Submission')) {
-              el.style.color = 'purple'; // Change to your preferred color
-            }
-          });
+  // For dynamically added content after form submission
+  // This handles the case when the modal content is replaced
+  const observer = new MutationObserver(function(mutations) {
+    mutations.forEach(function(mutation) {
+      if (mutation.type === 'childList') {
+        const submissionTexts = document.evaluate(
+          "//text()[contains(., 'Submission')]", 
+          document, 
+          null, 
+          XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, 
+          null
+        );
+        
+        for (let i = 0; i < submissionTexts.snapshotLength; i++) {
+          const textNode = submissionTexts.snapshotItem(i);
+          if (textNode.parentNode) {
+            textNode.parentNode.style.color = 'red'; // Change to your desired color
+          }
         }
       }
     });
   });
   
-  // Start observing all modals
-  document.querySelectorAll('.modal').forEach(modal => {
-    observer.observe(modal, { attributes: true });
+  // Observe the body for changes
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true
   });
-}
-
-// Run the function when the document is ready
-document.addEventListener('DOMContentLoaded', initSubmissionModalStyles);
-
-// In case the DOM is already loaded when this script runs
-if (document.readyState === 'complete' || document.readyState === 'interactive') {
-  initSubmissionModalStyles();
-}</script>
+});</script>
 </body>
 </html>
