@@ -15,3 +15,28 @@
   command = "npm run dev"
   port = 8888
   publish = "."
+
+# Skip unnecessary build steps
+[build.environment]
+  # Skip Ruby installation - your site doesn't need it
+  NETLIFY_RUBY_SKIP = "true"
+  # Skip Python installation if you don't need it
+  NETLIFY_PYTHON_SKIP = "true"
+  
+# Optimize build performance
+[build.processing]
+  skip_processing = false
+
+[build.processing.css]
+  bundle = true
+  minify = true
+
+[build.processing.js]
+  bundle = true
+  minify = true
+
+[build.processing.html]
+  pretty_urls = true
+
+[build.processing.images]
+  compress = true
