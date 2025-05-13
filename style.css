@@ -322,3 +322,27 @@ body::before {
     font-size: 16px;
   }
 }
+.modal-title {
+  color: red !important; /* Change to your preferred color */
+}
+
+/* Target the "Submission" text specifically */
+.modal-content div:first-child,
+.modal-content h2 {
+  color: red !important; /* Change to your preferred color */
+}
+
+/* Style the close button if needed */
+.close-modal {
+  color: white !important; /* Keep this white for visibility */
+}
+
+/* Style the specific success message that appears after form submission */
+.modal-content h2.modal-title[style*="color: #4CAF50"] {
+  color: red !important; /* This will override the inline style */
+}
+
+/* For the specific popup shown in your screenshot */
+.modal-content > div:first-child {
+  color: red !important;
+}
