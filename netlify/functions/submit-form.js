@@ -1,5 +1,3 @@
-
-
 exports.handler = async function(event) {
   try {
     const webhookUrl = process.env.DISCORD_WEBHOOK_URL;
