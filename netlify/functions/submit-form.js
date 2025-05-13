@@ -1,4 +1,3 @@
-// netlify/functions/submit-form.js
 export async function handler(event, context) {
   if (event.httpMethod !== 'POST') {
     return {
@@ -7,15 +6,17 @@ export async function handler(event, context) {
     };
   }
 
-  const webhookUrl = 'https://discord.com/api/webhooks/1371143336135491645/-WshRcFpKQcT4GEo98LCBlSvGldg0_MJrGlz-WSoI8INgo8jEqGk06NWOem_rCziZApr'; // KEEP THIS PRIVATE
-
+  const webhookUrl = process.env.DISCORD_WEBHOOK_URL;
   const body = JSON.parse(event.body);
 
   try {
-    const response = await fetch(webhookUrl, {
+    await fetch(webhookUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body)
+      body: JSON.stringify({
+        content: body.message || 'New submission received!',
+        username: "Website Bot"
+      })
     });
 
     return {
