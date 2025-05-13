@@ -439,3 +439,83 @@ document.querySelectorAll('.social-icon').forEach((icon, index) => {
 document.getElementById('games-btn')?.addEventListener('click', () => {
   alert('Games section coming soon! Stay tuned for interactive games and challenges!');
 });
+// Rate limit message creation function
+function showRateLimitMessage(message, waitTime) {
+  const rateLimitMessage = document.createElement('div');
+  rateLimitMessage.className = 'rate-limit-message';
+  rateLimitMessage.innerHTML = `
+    <div class="rate-limit-content">
+      <h3>Submission Limit Reached</h3>
+      <p>${message}</p>
+      <p>Please wait ${waitTime} before trying again.</p>
+      <button class="btn">Close</button>
+    </div>
+  `;
+  
+  document.body.appendChild(rateLimitMessage);
+  
+  const closeBtn = rateLimitMessage.querySelector('button');
+  closeBtn.addEventListener('click', () => {
+    document.body.removeChild(rateLimitMessage);
+  });
+  
+  return rateLimitMessage;
+}
+
+// Modified function to open modal with rate limit check
+function openModalWithRateLimitCheck(btnId, modalId) {
+  const btn = document.getElementById(btnId);
+  const modal = document.getElementById(modalId);
+  
+  if (btn && modal) {
+    btn.addEventListener('click', () => {
+      // If this is a form modal, check if form ID exists
+      const formId = modalId.replace('modal', 'form');
+      const form = document.getElementById(formId);
+      
+      // If there's a form, check rate limits
+      if (form) {
+        const rateLimit = checkRateLimit(formId);
+        
+        if (!rateLimit.allowed) {
+          // Show rate limit message instead of opening modal
+          showRateLimitMessage(rateLimit.message, rateLimit.waitTime);
+          return;
+        }
+      }
+      
+      // If no rate limit issues, open modal normally
+      modal.style.display = 'block';
+      setTimeout(() => {
+        modal.classList.add('active');
+      }, 10);
+    });
+  }
+}
+
+// Update all modals to use the new function
+document.addEventListener('DOMContentLoaded', function() {
+  const modals = {
+    'login-btn': 'login-modal',
+    'friend-btn': 'friend-modal',
+    'appeal-btn': 'appeal-modal',
+    'events-btn': 'events-modal'
+  };
+  
+  // Set up each modal with the rate limit check
+  Object.entries(modals).forEach(([btnId, modalId]) => {
+    openModalWithRateLimitCheck(btnId, modalId);
+  });
+  
+  // Apply the same for mobile buttons
+  const mobileModals = {
+    'login-btn-mobile': 'login-modal',
+    'friend-btn-mobile': 'friend-modal',
+    'appeal-btn-mobile': 'appeal-modal',
+    'events-btn-mobile': 'events-modal'
+  };
+  
+  Object.entries(mobileModals).forEach(([btnId, modalId]) => {
+    openModalWithRateLimitCheck(btnId, modalId);
+  });
+});
