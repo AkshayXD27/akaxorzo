@@ -147,16 +147,15 @@ else if (formId === 'appeal-form') {
     // Send data to Discord webhook
     const webhookUrl = "https://discord.com/api/webhooks/1371143336135491645/-WshRcFpKQcT4GEo98LCBlSvGldg0_MJrGlz-WSoI8INgo8jEqGk06NWOem_rCziZApr"; // Replace with your actual webhook URL
     
-    fetch(webhookUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(webhookData)
-    })
-    .then(response => {
-      console.log("Webhook response:", response);
-      
+    fetch("/.netlify/functions/submit-form", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ message: "Someone clicked Ban Appeal!" })
+})
+.then(res => res.json())
+.then(data => console.log("Webhook response:", data))
+.catch(err => console.error("Error:", err));
+
       // Show success message
       const modal = form.closest('.modal');
       const modalContent = modal.querySelector('.modal-content');
