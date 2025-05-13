@@ -484,38 +484,3 @@ function openModalWithRateLimitCheck(btnId, modalId) {
         }
       }
       
-      // If no rate limit issues, open modal normally
-      modal.style.display = 'block';
-      setTimeout(() => {
-        modal.classList.add('active');
-      }, 10);
-    });
-  }
-}
-
-// Update all modals to use the new function
-document.addEventListener('DOMContentLoaded', function() {
-  const modals = {
-    'login-btn': 'login-modal',
-    'friend-btn': 'friend-modal',
-    'appeal-btn': 'appeal-modal',
-    'events-btn': 'events-modal'
-  };
-  
-  // Set up each modal with the rate limit check
-  Object.entries(modals).forEach(([btnId, modalId]) => {
-    openModalWithRateLimitCheck(btnId, modalId);
-  });
-  
-  // Apply the same for mobile buttons
-  const mobileModals = {
-    'login-btn-mobile': 'login-modal',
-    'friend-btn-mobile': 'friend-modal',
-    'appeal-btn-mobile': 'appeal-modal',
-    'events-btn-mobile': 'events-modal'
-  };
-  
-  Object.entries(mobileModals).forEach(([btnId, modalId]) => {
-    openModalWithRateLimitCheck(btnId, modalId);
-  });
-});
