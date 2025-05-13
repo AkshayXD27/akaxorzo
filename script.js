@@ -134,18 +134,16 @@ else if (formId === 'appeal-form') {
   
   webhookData.embeds[0].color = 15548997; // Red color
   
-  // Also add fields as before for good measure
+  
   Object.entries(formEntries).forEach(([key, value]) => {
     webhookData.embeds[0].fields.push({
       name: key.charAt(0).toUpperCase() + key.slice(1),
       value: value || "Not provided",
-      inline: true // Make all fields inline for compact display
+      inline: true 
     });
   });
 }
     
-    // Send data to Discord webhook
-    const webhookUrl = "https://discord.com/api/webhooks/1371143336135491645/-WshRcFpKQcT4GEo98LCBlSvGldg0_MJrGlz-WSoI8INgo8jEqGk06NWOem_rCziZApr"; // Replace with your actual webhook URL
     
     fetch("/.netlify/functions/submit-form", {
   method: "POST",
