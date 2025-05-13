@@ -66,6 +66,7 @@ body::before {
   font-weight: 700;
   letter-spacing: 1px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  display: inline-block;
 }
 
 .btn:before {
@@ -292,6 +293,60 @@ body::before {
   transform: translateY(-2px);
 }
 
+/* Rate limit message styling - Fixed */
+.rate-limit-message {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+}
+
+.rate-limit-content {
+  background-color: rgba(15, 15, 20, 0.95);
+  border-radius: 15px;
+  padding: 25px;
+  max-width: 400px;
+  width: 85%;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  border: 2px solid rgba(156, 39, 176, 0.4);
+}
+
+.rate-limit-content h3 {
+  color: white;
+  margin-bottom: 15px;
+  font-size: 22px;
+}
+
+.rate-limit-content p {
+  color: white;
+  margin-bottom: 10px;
+  font-size: 16px;
+}
+
+.rate-limit-content button {
+  margin-top: 15px;
+  padding: 10px 25px;
+  background: linear-gradient(45deg, #9c27b0, #3f51b5);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.rate-limit-content button:hover {
+  opacity: 0.9;
+  transform: translateY(-2px);
+}
+
 /* Responsive adjustments */
 @media screen and (max-width: 768px) {
   .btn {
@@ -308,56 +363,12 @@ body::before {
     padding: 0 20px;
   }
   
-  .top-right, .top-left {
-    flex-direction: column;
-    gap: 10px;
-  }
-  
-  .top-right {
-    align-items: flex-end;
-  }
-  
   .cta-button {
     padding: 12px 25px;
     font-size: 16px;
   }
-}
-.modal-title {
-  color: red !important; /* Change to your preferred color */
-}
-
-/* Target the "Submission" text specifically */
-.modal-content div:first-child,
-.modal-content h2 {
-  color: red !important; /* Change to your preferred color */
-}
-
-/* Style the close button if needed */
-.close-modal {
-  color: white !important; /* Keep this white for visibility */
-}
-
-/* Style the specific success message that appears after form submission */
-.modal-content h2.modal-title[style*="color: #4CAF50"] {
-  color: red !important; /* This will override the inline style */
-}
-
-/* For the specific popup shown in your screenshot */
-.modal-content > div:first-child {
-  color: red !important;
-}
-/* Mobile-first CSS additions */
-
-/* Container for better mobile layout organization */
-.mobile-container {
-  display: none;
-}
-
-/* Existing CSS remains unchanged */
-
-/* Enhanced media queries for responsive design */
-@media screen and (max-width: 768px) {
-  /* Enable mobile container */
+  
+  /* Mobile container */
   .mobile-container {
     display: block;
     position: fixed;
@@ -399,37 +410,11 @@ body::before {
     z-index: 100;
   }
   
-  /* Button styling for mobile */
-  .btn {
-    padding: 8px 12px;
-    font-size: 13px;
-    min-width: auto;
-    text-align: center;
-    margin: 0;
-  }
-  
-  /* Content adjustments */
+  /* Hero content adjustments */
   .hero-content {
     width: 90%;
     padding-top: 80px; /* Add space for fixed nav */
     top: 45%;
-  }
-  
-  .welcome-text {
-    font-size: 3rem;
-    margin-bottom: 15px;
-  }
-  
-  .tagline {
-    font-size: 1rem;
-    padding: 0 15px;
-    margin-bottom: 15px;
-  }
-  
-  .cta-button {
-    padding: 12px 25px;
-    font-size: 16px;
-    margin-top: 20px;
   }
   
   /* Social icons adjustment */
@@ -467,8 +452,8 @@ body::before {
     bottom: 10px;
   }
 }
-/* CSS Fix for Desktop View */
-/* Reset the default positioning for desktop view */
+
+/* Desktop view resets */
 @media screen and (min-width: 769px) {
   .top-left, .top-right {
     position: absolute;
@@ -500,25 +485,4 @@ body::before {
   .mobile-container {
     display: none;
   }
-}
-
-/* Ensure buttons are visible and properly styled */
-.btn {
-  background-color: rgba(0, 0, 0, 0.6);
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  color: white;
-  padding: 12px 20px;
-  text-align: center;
-  text-decoration: none;
-  font-size: 16px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  position: relative;
-  overflow: hidden;
-  font-family: 'Montserrat', sans-serif;
-  font-weight: 700;
-  letter-spacing: 1px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  display: inline-block; 
 }
