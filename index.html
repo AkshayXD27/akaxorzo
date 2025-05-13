@@ -14,15 +14,17 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="top-left">
-    <button class="btn" id="discord-btn"><i class="fab fa-discord"></i>Discord</button>
-    <button class="btn" id="youtube-btn"><i class="fab fa-youtube"></i>YouTube</button>
-  </div>
-  
-  <div class="top-right">
-    <button class="btn" id="events-btn"><i class="far fa-calendar-alt"></i>Events</button>
-    <button class="btn" id="login-btn"><i class="fas fa-sign-in-alt"></i>Login</button>
-    <button class="btn" id="games-btn"><i class="fas fa-gamepad"></i>Games</button>
+  <div class="mobile-container">
+    <div class="top-left">
+      <button class="btn" id="discord-btn"><i class="fab fa-discord"></i>Discord</button>
+      <button class="btn" id="youtube-btn"><i class="fab fa-youtube"></i>YouTube</button>
+    </div>
+    
+    <div class="top-right">
+      <button class="btn" id="events-btn"><i class="far fa-calendar-alt"></i>Events</button>
+      <button class="btn" id="login-btn"><i class="fas fa-sign-in-alt"></i>Login</button>
+      <button class="btn" id="games-btn"><i class="fas fa-gamepad"></i>Games</button>
+    </div>
   </div>
   
   <div class="right-side">
@@ -112,59 +114,5 @@
   
   <!-- Custom JavaScript -->
   <script src="script.js"></script>
-  <script>
-// This is a simpler, more targeted JavaScript solution
-// Add this to your script.js file or keep it in your HTML
-
-document.addEventListener('DOMContentLoaded', function() {
-  // Create a style element
-  const style = document.createElement('style');
-  
-  // Add CSS rules that specifically target the "Submission" text
-  style.textContent = `
-    /* Change the color of modal titles */
-    .modal-title {
-      color: red !important; /* Change to your desired color */
-    }
-    
-    /* Change "Submission" text in success messages */
-    .modal-content h2[style*="color: #4CAF50"],
-    .modal-content div:first-child:contains("Submission") {
-      color: red !important; /* Change to your desired color */
-    }
-  `;
-  
-  // Add the style to the document
-  document.head.appendChild(style);
-  
-  // For dynamically added content after form submission
-  // This handles the case when the modal content is replaced
-  const observer = new MutationObserver(function(mutations) {
-    mutations.forEach(function(mutation) {
-      if (mutation.type === 'childList') {
-        const submissionTexts = document.evaluate(
-          "//text()[contains(., 'Submission')]", 
-          document, 
-          null, 
-          XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, 
-          null
-        );
-        
-        for (let i = 0; i < submissionTexts.snapshotLength; i++) {
-          const textNode = submissionTexts.snapshotItem(i);
-          if (textNode.parentNode) {
-            textNode.parentNode.style.color = 'red'; // Change to your desired color
-          }
-        }
-      }
-    });
-  });
-  
-  // Observe the body for changes
-  observer.observe(document.body, {
-    childList: true,
-    subtree: true
-  });
-});</script>
 </body>
 </html>
