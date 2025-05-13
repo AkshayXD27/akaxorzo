@@ -22,12 +22,14 @@ Object.entries(modals).forEach(([btnId, modalId]) => {
   const btn = document.getElementById(btnId);
   const modal = document.getElementById(modalId);
   
-  btn.addEventListener('click', () => {
-    modal.style.display = 'block';
-    setTimeout(() => {
-      modal.classList.add('active');
-    }, 10);
-  });
+  if (btn && modal) {
+    btn.addEventListener('click', () => {
+      modal.style.display = 'block';
+      setTimeout(() => {
+        modal.classList.add('active');
+      }, 10);
+    });
+  }
 });
 
 // Close modal functionality
@@ -96,64 +98,69 @@ document.querySelectorAll('form').forEach(form => {
       });
     } 
     else if (formId === 'friend-form') {
-  webhookData.embeds[0].title = "New Friend Request";
-  webhookData.embeds[0].color = 5763719; // Green color
+      webhookData.embeds[0].title = "New Friend Request";
+      webhookData.embeds[0].color = 5763719; // Green color
 
-  // Add a detailed description
-  webhookData.embeds[0].description = "**Friend Request Details:**\n";
+      // Add a detailed description
+      webhookData.embeds[0].description = "**Friend Request Details:**\n";
 
-  Object.entries(formEntries).forEach(([key, value]) => {
-    webhookData.embeds[0].description += `**${key.charAt(0).toUpperCase() + key.slice(1)}:** ${value || "Not provided"}\n`;
-    webhookData.embeds[0].fields.push({
-      name: key.charAt(0).toUpperCase() + key.slice(1),
-      value: value || "Not provided",
-      inline: true
-    });
-  });
-}
-
-else if (formId === 'appeal-form') {
-  // Debug: Log all form entries to see what field names are actually being used
-  console.log("Form entries received:", formEntries);
-  
-  // Try to identify the correct field names based on common naming patterns
-  // These should match EXACTLY how they are named in your HTML form
-  const usernameField = formEntries.username || formEntries.name || formEntries.user || formEntries.discord_name || "Not provided";
-  const discordIdField = formEntries.discordid || formEntries.discord_id || formEntries.id || formEntries.discord || "Not provided";
-  const reasonField = formEntries.reason || formEntries.appeal_reason || formEntries.textarea || formEntries.message || formEntries.description || "Not provided";
-  
-  webhookData.embeds[0].title = "New Ban Appeal";
-  
-  // Add the exact field names we received to the description
-  webhookData.embeds[0].description = "**Ban Appeal Details:**\n";
-  
-  // Add all form fields to the description to ensure we show all data
-  Object.entries(formEntries).forEach(([key, value]) => {
-    webhookData.embeds[0].description += `**${key.charAt(0).toUpperCase() + key.slice(1)}:** ${value || "Not provided"}\n`;
-  });
-  
-  webhookData.embeds[0].color = 15548997; // Red color
-  
-  
-  Object.entries(formEntries).forEach(([key, value]) => {
-    webhookData.embeds[0].fields.push({
-      name: key.charAt(0).toUpperCase() + key.slice(1),
-      value: value || "Not provided",
-      inline: true 
-    });
-  });
-}
+      Object.entries(formEntries).forEach(([key, value]) => {
+        webhookData.embeds[0].description += `**${key.charAt(0).toUpperCase() + key.slice(1)}:** ${value || "Not provided"}\n`;
+        webhookData.embeds[0].fields.push({
+          name: key.charAt(0).toUpperCase() + key.slice(1),
+          value: value || "Not provided",
+          inline: true
+        });
+      });
+    }
+    else if (formId === 'appeal-form') {
+      console.log("Form entries received:", formEntries);
+      
+      webhookData.embeds[0].title = "New Ban Appeal";
+      webhookData.embeds[0].description = "**Ban Appeal Details:**\n";
+      webhookData.embeds[0].color = 15548997; // Red color
+      
+      // Add all form fields to the description and as fields
+      Object.entries(formEntries).forEach(([key, value]) => {
+        webhookData.embeds[0].description += `**${key.charAt(0).toUpperCase() + key.slice(1)}:** ${value || "Not provided"}\n`;
+        webhookData.embeds[0].fields.push({
+          name: key.charAt(0).toUpperCase() + key.slice(1),
+          value: value || "Not provided",
+          inline: true 
+        });
+      });
+    }
+    else if (formId === 'events-form') {
+      webhookData.embeds[0].title = "New Event Registration";
+      webhookData.embeds[0].description = "Someone registered for an event";
+      webhookData.embeds[0].color = 16750848; // Orange color
+      
+      Object.entries(formEntries).forEach(([key, value]) => {
+        webhookData.embeds[0].fields.push({
+          name: key.charAt(0).toUpperCase() + key.slice(1),
+          value: value || "Not provided",
+          inline: true
+        });
+      });
+    }
     
-    
+    // Send data to our Netlify function
     fetch("/.netlify/functions/submit-form", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ message: "Someone clicked Ban Appeal!" })
-})
-.then(res => res.json())
-.then(data => console.log("Webhook response:", data))
-.catch(err => console.error("Error:", err));
-
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ 
+        webhookData: webhookData 
+      })
+    })
+    .then(res => {
+      if (!res.ok) {
+        throw new Error(`Server responded with ${res.status}`);
+      }
+      return res.json();
+    })
+    .then(data => {
+      console.log("Webhook response:", data);
+      
       // Show success message
       const modal = form.closest('.modal');
       const modalContent = modal.querySelector('.modal-content');
@@ -194,17 +201,17 @@ else if (formId === 'appeal-form') {
 });
 
 // External links functionality
-document.getElementById('discord-btn').addEventListener('click', () => {
+document.getElementById('discord-btn')?.addEventListener('click', () => {
   // Replace with your actual Discord link
   window.open('https://discord.gg/EynZRyFq3c', '_blank');
 });
 
-document.getElementById('youtube-btn').addEventListener('click', () => {
+document.getElementById('youtube-btn')?.addEventListener('click', () => {
   // Replace with your actual YouTube channel
   window.open('https://youtube.com/@Akaxorzo', '_blank');
 });
 
-document.getElementById('subscribe-btn').addEventListener('click', (e) => {
+document.getElementById('subscribe-btn')?.addEventListener('click', (e) => {
   e.preventDefault();
   // Replace with your actual subscription/channel link
   window.open('https://youtube.com/@Akaxorzo?sub_confirmation=1', '_blank');
@@ -222,6 +229,6 @@ document.querySelectorAll('.social-icon').forEach((icon, index) => {
 });
 
 // Games button functionality
-document.getElementById('games-btn').addEventListener('click', () => {
+document.getElementById('games-btn')?.addEventListener('click', () => {
   alert('Games section coming soon! Stay tuned for interactive games and challenges!');
 });
