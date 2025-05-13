@@ -1,4 +1,4 @@
-const fetch = require('node-fetch'); // Only needed if you're using Node <18
+
 
 exports.handler = async function(event) {
   try {
