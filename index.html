@@ -112,5 +112,66 @@
   
   <!-- Custom JavaScript -->
   <script src="script.js"></script>
+  <script>
+function initSubmissionModalStyles() {
+  // Create a style element for custom styles
+  const styleElement = document.createElement('style');
+  
+  // Add CSS rules to change the text color of "Submission" text
+  styleElement.textContent = `
+    /* Target the submission header specifically */
+    .modal-content div:first-child,
+    .modal-content > div:contains("Submission"),
+    .modal-content div:first-of-type,
+    .modal-title {
+      color: purple !important; /* Change to your preferred color */
+    }
+    
+    /* Make sure our style takes precedence */
+    div.modal-content > *:first-child {
+      color: purple !important; /* Change to your preferred color */
+    }
+    
+    /* If the text is in a button or specific element */
+    .close {
+      color: purple !important; /* For consistency, you might want to style the close button too */
+    }
+  `;
+  
+  // Add the style element to the document head
+  document.head.appendChild(styleElement);
+  
+  // For dynamic content that might be added later
+  // Monitor for modal activations
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+        const modal = mutation.target;
+        if (modal.classList.contains('active') && modal.style.display !== 'none') {
+          // Modal was activated, look for the submission text
+          const elements = modal.querySelectorAll('*');
+          elements.forEach(el => {
+            if (el.textContent && el.textContent.includes('Submission')) {
+              el.style.color = 'purple'; // Change to your preferred color
+            }
+          });
+        }
+      }
+    });
+  });
+  
+  // Start observing all modals
+  document.querySelectorAll('.modal').forEach(modal => {
+    observer.observe(modal, { attributes: true });
+  });
+}
+
+// Run the function when the document is ready
+document.addEventListener('DOMContentLoaded', initSubmissionModalStyles);
+
+// In case the DOM is already loaded when this script runs
+if (document.readyState === 'complete' || document.readyState === 'interactive') {
+  initSubmissionModalStyles();
+}</script>
 </body>
 </html>
