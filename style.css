@@ -467,3 +467,58 @@ body::before {
     bottom: 10px;
   }
 }
+/* CSS Fix for Desktop View */
+/* Reset the default positioning for desktop view */
+@media screen and (min-width: 769px) {
+  .top-left, .top-right {
+    position: absolute;
+    display: flex;
+    flex-direction: row;
+    gap: 15px;
+  }
+  
+  .top-left {
+    top: 25px;
+    left: 25px;
+  }
+  
+  .top-right {
+    top: 25px;
+    right: 25px;
+  }
+  
+  .right-side {
+    position: absolute;
+    top: 40%;
+    right: 25px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  /* Hide mobile container in desktop */
+  .mobile-container {
+    display: none;
+  }
+}
+
+/* Ensure buttons are visible and properly styled */
+.btn {
+  background-color: rgba(0, 0, 0, 0.6);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: 12px 20px;
+  text-align: center;
+  text-decoration: none;
+  font-size: 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+  overflow: hidden;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  letter-spacing: 1px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  display: inline-block; /* Ensure the button is displayed */
+}
