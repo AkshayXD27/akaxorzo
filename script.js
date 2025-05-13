@@ -128,6 +128,44 @@ function formatTimeRemaining(milliseconds) {
   }
 }
 
+// Function to show rate limit message with proper styling
+function showRateLimitMessage(message, waitTime) {
+  // Remove any existing rate limit messages first
+  const existingMessage = document.querySelector('.rate-limit-message');
+  if (existingMessage) existingMessage.remove();
+
+  const rateLimitMessage = document.createElement('div');
+  rateLimitMessage.className = 'rate-limit-message';
+  rateLimitMessage.style = `
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+  `;
+
+  rateLimitMessage.innerHTML = `
+    <div class="rate-limit-content">
+      <h3 style="color: white; margin-bottom: 15px;">Submission Limit Reached</h3>
+      <p style="color: white; margin-bottom: 10px;">${message}</p>
+      <p style="color: white; margin-bottom: 20px;">Please wait ${waitTime} before trying again.</p>
+      <button class="btn" style="background: linear-gradient(45deg, #9c27b0, #3f51b5); color: white;">Close</button>
+    </div>
+  `;
+
+  document.body.appendChild(rateLimitMessage);
+
+  const closeBtn = rateLimitMessage.querySelector('button');
+  closeBtn.addEventListener('click', () => {
+    document.body.removeChild(rateLimitMessage);
+  });
+}
+
 // Open modal with rate limit check
 Object.entries(modals).forEach(([btnId, modalId]) => {
   const btn = document.getElementById(btnId);
@@ -145,50 +183,7 @@ Object.entries(modals).forEach(([btnId, modalId]) => {
         
         if (!rateLimit.allowed) {
           // Show rate limit message instead of opening modal
-          const rateLimitMessage = document.createElement('div');
-          rateLimitMessage.className = 'rate-limit-message';
-          rateLimitMessage.innerHTML = `
-            <div class="rate-limit-content">
-              <h3>Submission Limit Reached</h3>
-              <p>${rateLimit.message}</p>
-              <p>Please wait ${rateLimit.waitTime} before trying again.</p>
-              <button class="btn">Close</button>
-            </div>
-          `;
-          
-          rateLimitMessage.style.position = 'fixed';
-          rateLimitMessage.style.top = '0';
-          rateLimitMessage.style.left = '0';
-          rateLimitMessage.style.width = '100%';
-          rateLimitMessage.style.height = '100%';
-          rateLimitMessage.style.backgroundColor = 'rgba(0,0,0,0.7)';
-          rateLimitMessage.style.display = 'flex';
-          rateLimitMessage.style.justifyContent = 'center';
-          rateLimitMessage.style.alignItems = 'center';
-          rateLimitMessage.style.zIndex = '10000';
-          
-          const content = rateLimitMessage.querySelector('.rate-limit-content');
-          content.style.backgroundColor = '#fff';
-          content.style.borderRadius = '8px';
-          content.style.padding = '20px';
-          content.style.maxWidth = '400px';
-          content.style.textAlign = 'center';
-          
-          const closeBtn = content.querySelector('button');
-          closeBtn.style.marginTop = '15px';
-          closeBtn.style.background = 'linear-gradient(45deg, #9c27b0, #3f51b5)';
-          closeBtn.style.border = 'none';
-          closeBtn.style.color = 'white';
-          closeBtn.style.padding = '10px 20px';
-          closeBtn.style.borderRadius = '4px';
-          closeBtn.style.cursor = 'pointer';
-          
-          document.body.appendChild(rateLimitMessage);
-          
-          closeBtn.addEventListener('click', () => {
-            document.body.removeChild(rateLimitMessage);
-          });
-          
+          showRateLimitMessage(rateLimit.message, rateLimit.waitTime);
           return;
         }
       }
@@ -236,7 +231,7 @@ document.querySelectorAll('form').forEach(form => {
     // Check rate limits first
     const rateLimit = checkRateLimit(formId);
     if (!rateLimit.allowed) {
-      alert(rateLimit.message);
+      showRateLimitMessage(rateLimit.message, rateLimit.waitTime);
       return;
     }
     
@@ -361,9 +356,9 @@ document.querySelectorAll('form').forEach(form => {
       // Replace with success message
       modalContent.innerHTML = `
         <h2 class="modal-title" style="color: #4CAF50; margin-bottom: 20px;">Success!</h2>
-        <p style="text-align: center; margin-bottom: 20px;">Your submission has been received.</p>
+        <p style="text-align: center; margin-bottom: 20px; color: white;">Your submission has been received.</p>
         ${data.remainingHourly !== undefined ? 
-          `<p style="text-align: center; margin-bottom: 20px; font-size: 14px; color: #666;">
+          `<p style="text-align: center; margin-bottom: 20px; font-size: 14px; color: white;">
             You have ${data.remainingHourly} submission${data.remainingHourly !== 1 ? 's' : ''} left this hour
             and ${data.remainingDaily} submission${data.remainingDaily !== 1 ? 's' : ''} left today.
           </p>` : ''}
@@ -399,7 +394,7 @@ document.querySelectorAll('form').forEach(form => {
       
       // Show appropriate error message
       if (error.message.includes('Rate limit exceeded')) {
-        alert(error.message);
+        showRateLimitMessage(error.message, "a few minutes");
       } else {
         alert("There was an error submitting your form. Please try again later.");
       }
@@ -439,48 +434,3 @@ document.querySelectorAll('.social-icon').forEach((icon, index) => {
 document.getElementById('games-btn')?.addEventListener('click', () => {
   alert('Games section coming soon! Stay tuned for interactive games and challenges!');
 });
-// Rate limit message creation function
-function showRateLimitMessage(message, waitTime) {
-  const rateLimitMessage = document.createElement('div');
-  rateLimitMessage.className = 'rate-limit-message';
-  rateLimitMessage.innerHTML = `
-    <div class="rate-limit-content">
-      <h3>Submission Limit Reached</h3>
-      <p>${message}</p>
-      <p>Please wait ${waitTime} before trying again.</p>
-      <button class="btn">Close</button>
-    </div>
-  `;
-  
-  document.body.appendChild(rateLimitMessage);
-  
-  const closeBtn = rateLimitMessage.querySelector('button');
-  closeBtn.addEventListener('click', () => {
-    document.body.removeChild(rateLimitMessage);
-  });
-  
-  return rateLimitMessage;
-}
-
-// Modified function to open modal with rate limit check
-function openModalWithRateLimitCheck(btnId, modalId) {
-  const btn = document.getElementById(btnId);
-  const modal = document.getElementById(modalId);
-  
-  if (btn && modal) {
-    btn.addEventListener('click', () => {
-      // If this is a form modal, check if form ID exists
-      const formId = modalId.replace('modal', 'form');
-      const form = document.getElementById(formId);
-      
-      // If there's a form, check rate limits
-      if (form) {
-        const rateLimit = checkRateLimit(formId);
-        
-        if (!rateLimit.allowed) {
-          // Show rate limit message instead of opening modal
-          showRateLimitMessage(rateLimit.message, rateLimit.waitTime);
-          return;
-        }
-      }
-      
