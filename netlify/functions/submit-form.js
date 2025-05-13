@@ -1,32 +1,42 @@
-export async function handler(event, context) {
-  if (event.httpMethod !== 'POST') {
-    return {
-      statusCode: 405,
-      body: 'Method Not Allowed',
-    };
-  }
+const fetch = require('node-fetch'); // Only needed if you're using Node <18
 
-  const webhookUrl = process.env.DISCORD_WEBHOOK_URL;
-  const body = JSON.parse(event.body);
-
+exports.handler = async function(event) {
   try {
-    await fetch(webhookUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        content: body.message || 'New submission received!',
-        username: "Website Bot"
-      })
+    const webhookUrl = process.env.DISCORD_WEBHOOK_URL;
+
+    if (!webhookUrl) {
+      return {
+        statusCode: 500,
+        body: JSON.stringify({ error: "Webhook URL not set in environment variables" })
+      };
+    }
+
+    const body = JSON.parse(event.body);
+
+    // This is where we send the message from the frontend
+    const payload = {
+      content: body.message || "Form submitted!",
+    };
+
+    const response = await fetch(webhookUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
     });
+
+    if (!response.ok) {
+      throw new Error("Failed to send message to Discord.");
+    }
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ message: 'Success' }),
+      body: JSON.stringify({ success: true }),
     };
-  } catch (err) {
+
+  } catch (error) {
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: 'Failed to send to Discord' }),
+      body: JSON.stringify({ error: error.message }),
     };
   }
-}
+};
