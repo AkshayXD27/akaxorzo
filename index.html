@@ -12,24 +12,39 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <!-- Custom CSS -->
   <link rel="stylesheet" href="style.css">
+  <!-- Desktop fixes CSS -->
+  <link rel="stylesheet" href="desktop-fixes.css">
 </head>
 <body>
+  <!-- Desktop navigation buttons - explicitly positioned for desktop view -->
+  <div class="top-left desktop-nav">
+    <button class="btn" id="discord-btn"><i class="fab fa-discord"></i> Discord</button>
+    <button class="btn" id="youtube-btn"><i class="fab fa-youtube"></i> YouTube</button>
+  </div>
+  
+  <div class="top-right desktop-nav">
+    <button class="btn" id="events-btn"><i class="far fa-calendar-alt"></i> Events</button>
+    <button class="btn" id="login-btn"><i class="fas fa-sign-in-alt"></i> Login</button>
+    <button class="btn" id="games-btn"><i class="fas fa-gamepad"></i> Games</button>
+  </div>
+  
+  <!-- Mobile navigation container -->
   <div class="mobile-container">
     <div class="top-left">
-      <button class="btn" id="discord-btn"><i class="fab fa-discord"></i>Discord</button>
-      <button class="btn" id="youtube-btn"><i class="fab fa-youtube"></i>YouTube</button>
+      <button class="btn" id="discord-btn-mobile"><i class="fab fa-discord"></i> Discord</button>
+      <button class="btn" id="youtube-btn-mobile"><i class="fab fa-youtube"></i> YouTube</button>
     </div>
     
     <div class="top-right">
-      <button class="btn" id="events-btn"><i class="far fa-calendar-alt"></i>Events</button>
-      <button class="btn" id="login-btn"><i class="fas fa-sign-in-alt"></i>Login</button>
-      <button class="btn" id="games-btn"><i class="fas fa-gamepad"></i>Games</button>
+      <button class="btn" id="events-btn-mobile"><i class="far fa-calendar-alt"></i> Events</button>
+      <button class="btn" id="login-btn-mobile"><i class="fas fa-sign-in-alt"></i> Login</button>
+      <button class="btn" id="games-btn-mobile"><i class="fas fa-gamepad"></i> Games</button>
     </div>
   </div>
   
   <div class="right-side">
-    <button class="btn" id="appeal-btn"><i class="fas fa-gavel"></i>Ban Appeal</button>
-    <button class="btn" id="friend-btn"><i class="fas fa-user-plus"></i>Friend Request</button>
+    <button class="btn" id="appeal-btn"><i class="fas fa-gavel"></i> Ban Appeal</button>
+    <button class="btn" id="friend-btn"><i class="fas fa-user-plus"></i> Friend Request</button>
   </div>
   
   <div class="hero-content">
@@ -63,12 +78,11 @@
       <span class="close-modal">&times;</span>
       <h2 class="modal-title">Send Friend Request</h2>
       <form id="friend-form">
-  <input type="text" name="username" placeholder="Your Username" required>
-  <input type="text" name="email" placeholder="Your Email" required>
-  <textarea name="message" placeholder="Message (Optional)" rows="4"></textarea>
-  <button type="submit">Send Request</button>
-</form>
-
+        <input type="text" name="username" placeholder="Your Username" required>
+        <input type="text" name="email" placeholder="Your Email" required>
+        <textarea name="message" placeholder="Message (Optional)" rows="4"></textarea>
+        <button type="submit">Send Request</button>
+      </form>
     </div>
   </div>
   
@@ -78,12 +92,11 @@
       <span class="close-modal">&times;</span>
       <h2 class="modal-title">Submit Ban Appeal</h2>
       <form id="appeal-form">
-  <input type="text" name="username" placeholder="Your Username" required>
-  <input type="text" name="discord" placeholder="Discord ID" required>
-  <textarea name="reason" placeholder="Reason for appeal..." rows="4" required></textarea>
-  <button type="submit">Submit Appeal</button>
-</form>
-
+        <input type="text" name="username" placeholder="Your Username" required>
+        <input type="text" name="discord" placeholder="Discord ID" required>
+        <textarea name="reason" placeholder="Reason for appeal..." rows="4" required></textarea>
+        <button type="submit">Submit Appeal</button>
+      </form>
     </div>
   </div>
   
@@ -111,6 +124,33 @@
       </div>
     </div>
   </div>
+  
+  <!-- JavaScript for connecting mobile buttons to desktop actions -->
+  <script>
+    // Connect mobile buttons to desktop button actions
+    document.addEventListener('DOMContentLoaded', function() {
+      const buttonPairs = {
+        'discord-btn-mobile': 'discord-btn',
+        'youtube-btn-mobile': 'youtube-btn',
+        'events-btn-mobile': 'events-btn',
+        'login-btn-mobile': 'login-btn',
+        'games-btn-mobile': 'games-btn'
+      };
+      
+      // For each mobile button, trigger the click of its desktop counterpart
+      Object.entries(buttonPairs).forEach(([mobileId, desktopId]) => {
+        const mobileBtn = document.getElementById(mobileId);
+        const desktopBtn = document.getElementById(desktopId);
+        
+        if (mobileBtn && desktopBtn) {
+          mobileBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            desktopBtn.click();
+          });
+        }
+      });
+    });
+  </script>
   
   <!-- Custom JavaScript -->
   <script src="script.js"></script>
