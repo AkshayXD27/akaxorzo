@@ -486,3 +486,141 @@ body::before {
     display: none;
   }
 }
+/* Additional styles for admin and moderator pages */
+/* Add these to your existing style.css file */
+
+/* Navigation styling */
+header nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 30px;
+  background: linear-gradient(45deg, #9c27b0, #3f51b5);
+  color: white;
+}
+
+.logo {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 1.5rem;
+  letter-spacing: 1px;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+#user-email {
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.9rem;
+}
+
+/* Main content areas */
+.admin-container, .moderator-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+h1 {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 2.2rem;
+  margin-bottom: 15px;
+  color: #333;
+}
+
+/* Panel styling */
+.admin-panel, .moderator-panel {
+  margin-top: 40px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  padding: 25px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.admin-panel h2, .moderator-panel h2 {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 1.8rem;
+  margin-bottom: 20px;
+  color: #333;
+  border-bottom: 2px solid #9c27b0;
+  padding-bottom: 10px;
+}
+
+/* Control cards */
+.admin-controls, .moderator-controls {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.control-card {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.control-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.control-card h3 {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 1.3rem;
+  margin-bottom: 10px;
+  color: #3f51b5;
+}
+
+.control-card p {
+  font-family: 'Poppins', sans-serif;
+  color: #666;
+  margin-bottom: 15px;
+  font-size: 0.9rem;
+}
+
+.control-card .btn {
+  width: 100%;
+  background: linear-gradient(45deg, #9c27b0, #3f51b5);
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+  transition: opacity 0.3s ease;
+}
+
+.control-card .btn:hover {
+  opacity: 0.9;
+}
+
+/* Footer styling */
+footer {
+  text-align: center;
+  padding: 20px;
+  background-color: #f1f1f1;
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.9rem;
+  color: #666;
+  margin-top: 40px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  header nav {
+    flex-direction: column;
+    gap: 15px;
+    padding: 15px;
+    text-align: center;
+  }
+  
+  .admin-controls, .moderator-controls {
+    grid-template-columns: 1fr;
+  }
+}
