@@ -19,13 +19,28 @@ document.addEventListener('DOMContentLoaded', function() {
     'events-btn': 'events-modal'
   };
 
-  // Open modal functionality
+  // Open modal with rate limit check
   Object.entries(modals).forEach(([btnId, modalId]) => {
     const btn = document.getElementById(btnId);
     const modal = document.getElementById(modalId);
     
     if (btn && modal) {
       btn.addEventListener('click', () => {
+        // If this is a form modal, check if form ID exists
+        const formId = modalId.replace('modal', 'form');
+        const form = document.getElementById(formId);
+        
+        // If there's a form, check rate limits
+        if (form) {
+          const rateLimit = checkRateLimit(formId);
+          
+          if (!rateLimit.allowed) {
+            // Show rate limit message instead of opening modal
+            showRateLimitMessage(rateLimit.message, rateLimit.waitTime);
+            return;
+          }
+        }
+        
         console.log(`Button ${btnId} clicked, opening modal ${modalId}`);
         modal.style.display = 'block';
         setTimeout(() => {
@@ -97,6 +112,49 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Form submission handling
   setupFormSubmissions();
+  
+  // Connect mobile login button to the main login button functionality
+  const mobileLoginBtn = document.getElementById('login-btn-mobile');
+  const mainLoginBtn = document.getElementById('login-btn');
+  const loginModal = document.getElementById('login-modal');
+  
+  if (mobileLoginBtn && mainLoginBtn && loginModal) {
+    mobileLoginBtn.addEventListener('click', () => {
+      loginModal.style.display = 'block';
+      setTimeout(() => {
+        loginModal.classList.add('active');
+      }, 10);
+    });
+  }
+  
+  // Add the custom popup styles to the document
+  const popupStyles = document.createElement('style');
+  popupStyles.textContent = `
+    .custom-popup-content button:hover {
+      opacity: 0.9;
+      transform: translateY(-2px);
+    }
+    
+    .custom-popup-content button:active {
+      transform: translateY(1px);
+    }
+    
+    @media (max-width: 768px) {
+      .custom-popup-content {
+        width: 90% !important;
+        padding: 20px !important;
+      }
+      
+      .custom-popup-content h3 {
+        font-size: 18px !important;
+      }
+      
+      .custom-popup-content p {
+        font-size: 14px !important;
+      }
+    }
+  `;
+  document.head.appendChild(popupStyles);
 });
 
 // Rate limiting functionality
@@ -323,61 +381,56 @@ function setupFormSubmissions() {
       submitBtn.innerHTML = 'Submitting...';
       submitBtn.disabled = true;
       
-      // Option 1: Simulate success for testing (remove in production)
-      simulateFormSuccess(form, formId);
-      
-      // Option 2: Use the Netlify function when it's ready
-      /*
-      fetch("/.netlify/functions/submit-form", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ webhookData: webhookData })
-      })
-      .then(res => {
-        if (!res.ok) {
-          if (res.status === 429) {
-            return res.json().then(data => {
-              throw new Error(`Rate limit exceeded: ${data.message}`);
-            });
+      // Send to Netlify function if available, otherwise simulate
+      if (typeof fetch === 'function') {
+        fetch("/.netlify/functions/submit-form", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ webhookData: webhookData })
+        })
+        .then(res => {
+          if (!res.ok) {
+            if (res.status === 429) {
+              return res.json().then(data => {
+                throw new Error(`Rate limit exceeded: ${data.message}`);
+              });
+            }
+            throw new Error(`Server responded with ${res.status}`);
           }
-          throw new Error(`Server responded with ${res.status}`);
-        }
-        return res.json();
-      })
-      .then(data => {
-        console.log("Webhook response:", data);
-        
-        // Record this submission for client-side rate limiting
-        recordSubmission(formId);
-        
-        displayFormSuccess(form, data);
-      })
-      .catch(error => {
-        console.error("Error sending to webhook:", error);
-        
-        // Reset button state
-        submitBtn.innerHTML = originalBtnText;
-        submitBtn.disabled = false;
-        
-        // Show appropriate error message
-        if (error.message.includes('Rate limit exceeded')) {
-          showRateLimitMessage(error.message, "a few minutes");
-        } else {
-          alert("There was an error submitting your form. Please try again later.");
-        }
-      });
-      */
+          return res.json();
+        })
+        .then(data => {
+          console.log("Webhook response:", data);
+          
+          // Record this submission for client-side rate limiting
+          recordSubmission(formId);
+          
+          displayFormSuccess(form, data);
+        })
+        .catch(error => {
+          console.error("Error sending to webhook:", error);
+          
+          // Reset button state
+          submitBtn.innerHTML = originalBtnText;
+          submitBtn.disabled = false;
+          
+          // Show appropriate error message
+          if (error.message.includes('Rate limit exceeded')) {
+            showRateLimitMessage(error.message, "a few minutes");
+          } else {
+            alert("There was an error submitting your form. Please try again later.");
+          }
+        });
+      } else {
+        // Fallback to simulation if fetch is not available
+        simulateFormSuccess(form, formId);
+      }
     });
   });
 }
 
-// Function to simulate form success (for testing only)
-function simulateFormSuccess(form, formId) {
-  console.log("Simulating form success for", formId);
-  
-  // Record this submission for client-side rate limiting
-  recordSubmission(formId);
-  
+// Function to display form success
+function displayFormSuccess(form, data) {
   // Show success message
   const modal = form.closest('.modal');
   const modalContent = modal.querySelector('.modal-content');
@@ -387,9 +440,14 @@ function simulateFormSuccess(form, formId) {
   modalContent.innerHTML = `
     <h2 class="modal-title" style="color: #4CAF50; margin-bottom: 20px;">Success!</h2>
     <p style="text-align: center; margin-bottom: 20px; color: white;">Your submission has been received.</p>
-    <p style="text-align: center; margin-bottom: 20px; font-size: 14px; color: white;">
-      Thank you for your submission!
-    </p>
+    ${data.remainingHourly !== undefined ? 
+      `<p style="text-align: center; margin-bottom: 20px; font-size: 14px; color: white;">
+        You have ${data.remainingHourly} submission${data.remainingHourly !== 1 ? 's' : ''} left this hour
+        and ${data.remainingDaily} submission${data.remainingDaily !== 1 ? 's' : ''} left today.
+      </p>` : 
+      `<p style="text-align: center; margin-bottom: 20px; font-size: 14px; color: white;">
+        Thank you for your submission!
+      </p>`}
     <button class="btn" style="width: 100%; background: linear-gradient(45deg, #9c27b0, #3f51b5);">Close</button>
   `;
   
@@ -414,53 +472,20 @@ function simulateFormSuccess(form, formId) {
   });
 }
 
-// Function to handle login form separately for Firebase
-// Function to handle login form with user-specific redirects
-function handleLoginForm(form) {
-  const formData = new FormData(form);
-  const email = formData.get('email');
-  const password = formData.get('password');
+// Function to simulate form success (for testing only)
+function simulateFormSuccess(form, formId) {
+  console.log("Simulating form success for", formId);
   
-  console.log(`Login attempt with email: ${email}`);
+  // Record this submission for client-side rate limiting
+  recordSubmission(formId);
   
-  // Check if Firebase is available
-  if (typeof firebase !== 'undefined' && firebase.auth) {
-    const submitBtn = form.querySelector('button[type="submit"]');
-    const originalBtnText = submitBtn.innerHTML;
-    submitBtn.innerHTML = 'Logging in...';
-    submitBtn.disabled = true;
-    
-    firebase.auth().signInWithEmailAndPassword(email, password)
-      .then((userCredential) => {
-        const user = userCredential.user;
-        console.log("User logged in:", user.email);
-        
-        // Store user email in session storage for page protection
-        sessionStorage.setItem('loggedInUser', user.email);
-        
-        // User-specific redirects based on email
-        if (user.email === 'akshaytest@gmail.com') {
-          window.location.href = 'page2.html';
-        } else if (user.email === 'ak2@gmail.com') {
-          window.location.href = 'page3.html';
-        } else {
-          // Default redirect for other authenticated users
-          window.location.href = 'dashboard.html';
-        }
-      })
-      .catch((error) => {
-        console.error("Login error:", error.code, error.message);
-        alert("Login failed: " + error.message);
-        
-        // Reset button state
-        submitBtn.innerHTML = originalBtnText;
-        submitBtn.disabled = false;
-      });
-  } else {
-    // Fallback if Firebase is not initialized
-    console.error("Firebase not available");
-    alert("Login functionality is not available. Please try again later.");
-  }
+  // Show success message
+  const data = {
+    remainingHourly: 1,
+    remainingDaily: 4
+  };
+  
+  displayFormSuccess(form, data);
 }
 
 // Function to create and show a custom popup
@@ -577,7 +602,7 @@ function showCustomPopup(title, message, type = 'info') {
   }
 }
 
-// Modified function to handle login with custom popup
+// Function to handle login form with Firebase
 function handleLoginForm(form) {
   const formData = new FormData(form);
   const email = formData.get('email');
@@ -606,7 +631,7 @@ function handleLoginForm(form) {
         // User-specific redirects based on email after a short delay
         setTimeout(() => {
           if (user.email === 'akshaytest@gmail.com') {
-            window.location.href = 'page2.html';
+            window.location.href = 'akax.html';
           } else if (user.email === 'ak2@gmail.com') {
             window.location.href = 'page3.html';
           } else {
@@ -631,49 +656,3 @@ function handleLoginForm(form) {
     showCustomPopup('System Error', 'Login functionality is not available. Please try again later.', 'error');
   }
 }
-
-// Add this to document ready to ensure we have the custom popup CSS
-document.addEventListener('DOMContentLoaded', function() {
-  // Add the custom popup styles to the document
-  const popupStyles = document.createElement('style');
-  popupStyles.textContent = `
-    .custom-popup-content button:hover {
-      opacity: 0.9;
-      transform: translateY(-2px);
-    }
-    
-    .custom-popup-content button:active {
-      transform: translateY(1px);
-    }
-    
-    @media (max-width: 768px) {
-      .custom-popup-content {
-        width: 90% !important;
-        padding: 20px !important;
-      }
-      
-      .custom-popup-content h3 {
-        font-size: 18px !important;
-      }
-      
-      .custom-popup-content p {
-        font-size: 14px !important;
-      }
-    }
-  `;
-  document.head.appendChild(popupStyles);
-  
-  // Connect mobile login button to the main login button functionality
-  const mobileLoginBtn = document.getElementById('login-btn-mobile');
-  const mainLoginBtn = document.getElementById('login-btn');
-  const loginModal = document.getElementById('login-modal');
-  
-  if (mobileLoginBtn && mainLoginBtn && loginModal) {
-    mobileLoginBtn.addEventListener('click', () => {
-      loginModal.style.display = 'block';
-      setTimeout(() => {
-        loginModal.classList.add('active');
-      }, 10);
-    });
-  }
-});
