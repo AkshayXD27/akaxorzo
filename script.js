@@ -1,21 +1,103 @@
-// Button hover animations
-document.querySelectorAll('.btn').forEach(button => {
-  button.addEventListener('mouseenter', () => {
-    button.style.transform = 'translateY(-3px)';
+// Firebase setup and authentication
+document.addEventListener('DOMContentLoaded', function() {
+  // Handle button hover animations
+  document.querySelectorAll('.btn').forEach(button => {
+    button.addEventListener('mouseenter', () => {
+      button.style.transform = 'translateY(-3px)';
+    });
+    
+    button.addEventListener('mouseleave', () => {
+      button.style.transform = 'translateY(0)';
+    });
   });
-  
-  button.addEventListener('mouseleave', () => {
-    button.style.transform = 'translateY(0)';
-  });
-});
 
-// Modal functionality
-const modals = {
-  'login-btn': 'login-modal',
-  'friend-btn': 'friend-modal',
-  'appeal-btn': 'appeal-modal',
-  'events-btn': 'events-modal'
-};
+  // Modal functionality
+  const modals = {
+    'login-btn': 'login-modal',
+    'friend-btn': 'friend-modal',
+    'appeal-btn': 'appeal-modal',
+    'events-btn': 'events-modal'
+  };
+
+  // Open modal functionality
+  Object.entries(modals).forEach(([btnId, modalId]) => {
+    const btn = document.getElementById(btnId);
+    const modal = document.getElementById(modalId);
+    
+    if (btn && modal) {
+      btn.addEventListener('click', () => {
+        console.log(`Button ${btnId} clicked, opening modal ${modalId}`);
+        modal.style.display = 'block';
+        setTimeout(() => {
+          modal.classList.add('active');
+        }, 10);
+      });
+    } else {
+      console.warn(`Missing elements for button ${btnId} or modal ${modalId}`);
+    }
+  });
+
+  // Close modal functionality
+  document.querySelectorAll('.close-modal').forEach(closeBtn => {
+    closeBtn.addEventListener('click', () => {
+      const modal = closeBtn.closest('.modal');
+      modal.classList.remove('active');
+      setTimeout(() => {
+        modal.style.display = 'none';
+      }, 300);
+    });
+  });
+
+  // Close modal when clicking outside
+  window.addEventListener('click', (e) => {
+    document.querySelectorAll('.modal').forEach(modal => {
+      if (e.target === modal) {
+        modal.classList.remove('active');
+        setTimeout(() => {
+          modal.style.display = 'none';
+        }, 300);
+      }
+    });
+  });
+
+  // External links functionality
+  document.getElementById('discord-btn')?.addEventListener('click', () => {
+    console.log("Discord button clicked");
+    window.open('https://discord.gg/EynZRyFq3c', '_blank');
+  });
+
+  document.getElementById('youtube-btn')?.addEventListener('click', () => {
+    console.log("YouTube button clicked");
+    window.open('https://youtube.com/@Akaxorzo', '_blank');
+  });
+
+  document.getElementById('subscribe-btn')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    console.log("Subscribe button clicked");
+    window.open('https://youtube.com/@Akaxorzo?sub_confirmation=1', '_blank');
+  });
+
+  // Social icon links
+  document.querySelectorAll('.social-icon').forEach((icon, index) => {
+    icon.addEventListener('click', () => {
+      const links = [
+        'https://twitch.tv/youraccount',
+        'https://twitter.com/youraccount'
+      ];
+      console.log(`Social icon ${index} clicked`);
+      window.open(links[index], '_blank');
+    });
+  });
+
+  // Games button functionality
+  document.getElementById('games-btn')?.addEventListener('click', () => {
+    console.log("Games button clicked");
+    alert('Games section coming soon! Stay tuned for interactive games and challenges!');
+  });
+
+  // Form submission handling
+  setupFormSubmissions();
+});
 
 // Rate limiting functionality
 const RATE_LIMIT_STORAGE_KEY = 'akaxorzo_form_submissions';
@@ -166,131 +248,64 @@ function showRateLimitMessage(message, waitTime) {
   });
 }
 
-// Open modal with rate limit check
-Object.entries(modals).forEach(([btnId, modalId]) => {
-  const btn = document.getElementById(btnId);
-  const modal = document.getElementById(modalId);
-  
-  if (btn && modal) {
-    btn.addEventListener('click', () => {
-      // If this is a form modal, check if form ID exists
-      const formId = modalId.replace('modal', 'form');
-      const form = document.getElementById(formId);
+// Setup form submissions
+function setupFormSubmissions() {
+  document.querySelectorAll('form').forEach(form => {
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      console.log(`Form ${form.id} submitted`);
       
-      // If there's a form, check rate limits
-      if (form) {
-        const rateLimit = checkRateLimit(formId);
-        
-        if (!rateLimit.allowed) {
-          // Show rate limit message instead of opening modal
-          showRateLimitMessage(rateLimit.message, rateLimit.waitTime);
-          return;
-        }
+      // Get the form ID to determine what action to take
+      const formId = form.id;
+      
+      // Handle login form separately if using Firebase
+      if (formId === 'login-form') {
+        handleLoginForm(form);
+        return;
       }
       
-      // If no rate limit issues, open modal normally
-      modal.style.display = 'block';
-      setTimeout(() => {
-        modal.classList.add('active');
-      }, 10);
-    });
-  }
-});
-
-// Close modal functionality
-document.querySelectorAll('.close-modal').forEach(closeBtn => {
-  closeBtn.addEventListener('click', () => {
-    const modal = closeBtn.closest('.modal');
-    modal.classList.remove('active');
-    setTimeout(() => {
-      modal.style.display = 'none';
-    }, 300);
-  });
-});
-
-// Close modal when clicking outside
-window.addEventListener('click', (e) => {
-  document.querySelectorAll('.modal').forEach(modal => {
-    if (e.target === modal) {
-      modal.classList.remove('active');
-      setTimeout(() => {
-        modal.style.display = 'none';
-      }, 300);
-    }
-  });
-});
-
-// Form submission handlers with Discord webhook integration
-document.querySelectorAll('form').forEach(form => {
-  form.addEventListener('submit', (e) => {
-    e.preventDefault();
-    
-    // Get the form ID to determine what action to take
-    const formId = form.id;
-    
-    // Check rate limits first
-    const rateLimit = checkRateLimit(formId);
-    if (!rateLimit.allowed) {
-      showRateLimitMessage(rateLimit.message, rateLimit.waitTime);
-      return;
-    }
-    
-    // Get form data
-    const formData = new FormData(form);
-    const formEntries = Object.fromEntries(formData.entries());
-    
-    // Prepare webhook data based on form type
-    let webhookData = {
-      content: null,
-      embeds: [{
-        title: "",
-        color: 10181046, // Purple color
-        fields: [],
-        footer: {
-          text: "Akaxorzo Website Submission",
-          icon_url: "https://i.imgur.com/yourlogo.png" // Replace with your logo URL
-        },
-        timestamp: new Date().toISOString()
-      }]
-    };
-    
-    // Configure webhook based on form type
-    if (formId === 'login-form') {
-      webhookData.embeds[0].title = "New Login Attempt";
-      webhookData.embeds[0].description = "Someone attempted to log in to the website";
-      webhookData.embeds[0].color = 3447003; // Blue color
+      // Check rate limits first
+      const rateLimit = checkRateLimit(formId);
+      if (!rateLimit.allowed) {
+        showRateLimitMessage(rateLimit.message, rateLimit.waitTime);
+        return;
+      }
       
-      // Add fields for each form input
-      Object.entries(formEntries).forEach(([key, value]) => {
-        webhookData.embeds[0].fields.push({
-          name: key.charAt(0).toUpperCase() + key.slice(1),
-          value: value || "Not provided",
-          inline: true
-        });
-      });
-    } 
-    else if (formId === 'friend-form') {
-      webhookData.embeds[0].title = "New Friend Request";
-      webhookData.embeds[0].color = 5763719; // Green color
-
-      // Add a detailed description
-      webhookData.embeds[0].description = "**Friend Request Details:**\n";
-
-      Object.entries(formEntries).forEach(([key, value]) => {
-        webhookData.embeds[0].description += `**${key.charAt(0).toUpperCase() + key.slice(1)}:** ${value || "Not provided"}\n`;
-        webhookData.embeds[0].fields.push({
-          name: key.charAt(0).toUpperCase() + key.slice(1),
-          value: value || "Not provided",
-          inline: true
-        });
-      });
-    }
-    else if (formId === 'appeal-form') {
-      console.log("Form entries received:", formEntries);
+      // Get form data
+      const formData = new FormData(form);
+      const formEntries = Object.fromEntries(formData.entries());
       
-      webhookData.embeds[0].title = "New Ban Appeal";
-      webhookData.embeds[0].description = "**Ban Appeal Details:**\n";
-      webhookData.embeds[0].color = 15548997; // Red color
+      // Prepare webhook data based on form type
+      let webhookData = {
+        content: null,
+        embeds: [{
+          title: "",
+          color: 10181046, // Purple color
+          fields: [],
+          footer: {
+            text: "Akaxorzo Website Submission",
+            icon_url: "https://i.imgur.com/yourlogo.png" // Replace with your logo URL
+          },
+          timestamp: new Date().toISOString()
+        }]
+      };
+      
+      // Configure webhook based on form type
+      if (formId === 'friend-form') {
+        webhookData.embeds[0].title = "New Friend Request";
+        webhookData.embeds[0].color = 5763719; // Green color
+        webhookData.embeds[0].description = "**Friend Request Details:**\n";
+      }
+      else if (formId === 'appeal-form') {
+        webhookData.embeds[0].title = "New Ban Appeal";
+        webhookData.embeds[0].description = "**Ban Appeal Details:**\n";
+        webhookData.embeds[0].color = 15548997; // Red color
+      }
+      else if (formId === 'events-form') {
+        webhookData.embeds[0].title = "New Event Registration";
+        webhookData.embeds[0].description = "Someone registered for an event";
+        webhookData.embeds[0].color = 16750848; // Orange color
+      }
       
       // Add all form fields to the description and as fields
       Object.entries(formEntries).forEach(([key, value]) => {
@@ -298,139 +313,367 @@ document.querySelectorAll('form').forEach(form => {
         webhookData.embeds[0].fields.push({
           name: key.charAt(0).toUpperCase() + key.slice(1),
           value: value || "Not provided",
-          inline: true 
-        });
-      });
-    }
-    else if (formId === 'events-form') {
-      webhookData.embeds[0].title = "New Event Registration";
-      webhookData.embeds[0].description = "Someone registered for an event";
-      webhookData.embeds[0].color = 16750848; // Orange color
-      
-      Object.entries(formEntries).forEach(([key, value]) => {
-        webhookData.embeds[0].fields.push({
-          name: key.charAt(0).toUpperCase() + key.slice(1),
-          value: value || "Not provided",
           inline: true
         });
       });
-    }
-    
-    // Set the submit button to loading state
-    const submitBtn = form.querySelector('button[type="submit"]');
-    const originalBtnText = submitBtn.innerHTML;
-    submitBtn.innerHTML = 'Submitting...';
-    submitBtn.disabled = true;
-    
-    // Send data to our Netlify function
-    fetch("/.netlify/functions/submit-form", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ 
-        webhookData: webhookData 
+      
+      // Set the submit button to loading state
+      const submitBtn = form.querySelector('button[type="submit"]');
+      const originalBtnText = submitBtn.innerHTML;
+      submitBtn.innerHTML = 'Submitting...';
+      submitBtn.disabled = true;
+      
+      // Option 1: Simulate success for testing (remove in production)
+      simulateFormSuccess(form, formId);
+      
+      // Option 2: Use the Netlify function when it's ready
+      /*
+      fetch("/.netlify/functions/submit-form", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ webhookData: webhookData })
       })
-    })
-    .then(res => {
-      if (!res.ok) {
-        if (res.status === 429) {
-          // Handle rate limit response
-          return res.json().then(data => {
-            throw new Error(`Rate limit exceeded: ${data.message}`);
-          });
-        }
-        throw new Error(`Server responded with ${res.status}`);
-      }
-      return res.json();
-    })
-    .then(data => {
-      console.log("Webhook response:", data);
-      
-      // Record this submission for client-side rate limiting
-      recordSubmission(formId);
-      
-      // Show success message
-      const modal = form.closest('.modal');
-      const modalContent = modal.querySelector('.modal-content');
-      const originalContent = modalContent.innerHTML;
-      
-      // Replace with success message
-      modalContent.innerHTML = `
-        <h2 class="modal-title" style="color: #4CAF50; margin-bottom: 20px;">Success!</h2>
-        <p style="text-align: center; margin-bottom: 20px; color: white;">Your submission has been received.</p>
-        ${data.remainingHourly !== undefined ? 
-          `<p style="text-align: center; margin-bottom: 20px; font-size: 14px; color: white;">
-            You have ${data.remainingHourly} submission${data.remainingHourly !== 1 ? 's' : ''} left this hour
-            and ${data.remainingDaily} submission${data.remainingDaily !== 1 ? 's' : ''} left today.
-          </p>` : ''}
-        <button class="btn" style="width: 100%; background: linear-gradient(45deg, #9c27b0, #3f51b5);">Close</button>
-      `;
-      
-      // Add event listener to the close button
-      modalContent.querySelector('button').addEventListener('click', () => {
-        modal.classList.remove('active');
-        setTimeout(() => {
-          modal.style.display = 'none';
-          // Reset the modal content and clear form
-          setTimeout(() => {
-            modalContent.innerHTML = originalContent;
-            form.reset();
-            // Reattach close modal functionality
-            modalContent.querySelector('.close-modal').addEventListener('click', () => {
-              modal.classList.remove('active');
-              setTimeout(() => {
-                modal.style.display = 'none';
-              }, 300);
+      .then(res => {
+        if (!res.ok) {
+          if (res.status === 429) {
+            return res.json().then(data => {
+              throw new Error(`Rate limit exceeded: ${data.message}`);
             });
-          }, 300);
-        }, 300);
+          }
+          throw new Error(`Server responded with ${res.status}`);
+        }
+        return res.json();
+      })
+      .then(data => {
+        console.log("Webhook response:", data);
+        
+        // Record this submission for client-side rate limiting
+        recordSubmission(formId);
+        
+        displayFormSuccess(form, data);
+      })
+      .catch(error => {
+        console.error("Error sending to webhook:", error);
+        
+        // Reset button state
+        submitBtn.innerHTML = originalBtnText;
+        submitBtn.disabled = false;
+        
+        // Show appropriate error message
+        if (error.message.includes('Rate limit exceeded')) {
+          showRateLimitMessage(error.message, "a few minutes");
+        } else {
+          alert("There was an error submitting your form. Please try again later.");
+        }
       });
-    })
-    .catch(error => {
-      console.error("Error sending to webhook:", error);
-      
-      // Reset button state
-      submitBtn.innerHTML = originalBtnText;
-      submitBtn.disabled = false;
-      
-      // Show appropriate error message
-      if (error.message.includes('Rate limit exceeded')) {
-        showRateLimitMessage(error.message, "a few minutes");
-      } else {
-        alert("There was an error submitting your form. Please try again later.");
-      }
+      */
     });
   });
-});
+}
 
-// External links functionality
-document.getElementById('discord-btn')?.addEventListener('click', () => {
-  // Replace with your actual Discord link
-  window.open('https://discord.gg/EynZRyFq3c', '_blank');
-});
-
-document.getElementById('youtube-btn')?.addEventListener('click', () => {
-  // Replace with your actual YouTube channel
-  window.open('https://youtube.com/@Akaxorzo', '_blank');
-});
-
-document.getElementById('subscribe-btn')?.addEventListener('click', (e) => {
-  e.preventDefault();
-  // Replace with your actual subscription/channel link
-  window.open('https://youtube.com/@Akaxorzo?sub_confirmation=1', '_blank');
-});
-
-// Social icon links
-document.querySelectorAll('.social-icon').forEach((icon, index) => {
-  icon.addEventListener('click', () => {
-    const links = [
-      'https://twitch.tv/youraccount',
-      'https://twitter.com/youraccount'
-    ];
-    window.open(links[index], '_blank');
+// Function to simulate form success (for testing only)
+function simulateFormSuccess(form, formId) {
+  console.log("Simulating form success for", formId);
+  
+  // Record this submission for client-side rate limiting
+  recordSubmission(formId);
+  
+  // Show success message
+  const modal = form.closest('.modal');
+  const modalContent = modal.querySelector('.modal-content');
+  const originalContent = modalContent.innerHTML;
+  
+  // Replace with success message
+  modalContent.innerHTML = `
+    <h2 class="modal-title" style="color: #4CAF50; margin-bottom: 20px;">Success!</h2>
+    <p style="text-align: center; margin-bottom: 20px; color: white;">Your submission has been received.</p>
+    <p style="text-align: center; margin-bottom: 20px; font-size: 14px; color: white;">
+      Thank you for your submission!
+    </p>
+    <button class="btn" style="width: 100%; background: linear-gradient(45deg, #9c27b0, #3f51b5);">Close</button>
+  `;
+  
+  // Add event listener to the close button
+  modalContent.querySelector('button').addEventListener('click', () => {
+    modal.classList.remove('active');
+    setTimeout(() => {
+      modal.style.display = 'none';
+      // Reset the modal content and clear form
+      setTimeout(() => {
+        modalContent.innerHTML = originalContent;
+        form.reset();
+        // Reattach close modal functionality
+        modalContent.querySelector('.close-modal').addEventListener('click', () => {
+          modal.classList.remove('active');
+          setTimeout(() => {
+            modal.style.display = 'none';
+          }, 300);
+        });
+      }, 300);
+    }, 300);
   });
-});
+}
 
-// Games button functionality
-document.getElementById('games-btn')?.addEventListener('click', () => {
-  alert('Games section coming soon! Stay tuned for interactive games and challenges!');
+// Function to handle login form separately for Firebase
+// Function to handle login form with user-specific redirects
+function handleLoginForm(form) {
+  const formData = new FormData(form);
+  const email = formData.get('email');
+  const password = formData.get('password');
+  
+  console.log(`Login attempt with email: ${email}`);
+  
+  // Check if Firebase is available
+  if (typeof firebase !== 'undefined' && firebase.auth) {
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const originalBtnText = submitBtn.innerHTML;
+    submitBtn.innerHTML = 'Logging in...';
+    submitBtn.disabled = true;
+    
+    firebase.auth().signInWithEmailAndPassword(email, password)
+      .then((userCredential) => {
+        const user = userCredential.user;
+        console.log("User logged in:", user.email);
+        
+        // Store user email in session storage for page protection
+        sessionStorage.setItem('loggedInUser', user.email);
+        
+        // User-specific redirects based on email
+        if (user.email === 'akshaytest@gmail.com') {
+          window.location.href = 'page2.html';
+        } else if (user.email === 'ak2@gmail.com') {
+          window.location.href = 'page3.html';
+        } else {
+          // Default redirect for other authenticated users
+          window.location.href = 'dashboard.html';
+        }
+      })
+      .catch((error) => {
+        console.error("Login error:", error.code, error.message);
+        alert("Login failed: " + error.message);
+        
+        // Reset button state
+        submitBtn.innerHTML = originalBtnText;
+        submitBtn.disabled = false;
+      });
+  } else {
+    // Fallback if Firebase is not initialized
+    console.error("Firebase not available");
+    alert("Login functionality is not available. Please try again later.");
+  }
+}
+
+// Function to create and show a custom popup
+function showCustomPopup(title, message, type = 'info') {
+  // Remove any existing popups first
+  const existingPopup = document.querySelector('.custom-popup-container');
+  if (existingPopup) existingPopup.remove();
+
+  // Create the popup container
+  const popupContainer = document.createElement('div');
+  popupContainer.className = 'custom-popup-container';
+  
+  // Set container styles
+  popupContainer.style.cssText = `
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  `;
+
+  // Determine color based on type
+  let color = '#3f51b5'; // Default blue
+  let icon = 'fa-info-circle';
+  
+  if (type === 'success') {
+    color = '#4CAF50'; // Green
+    icon = 'fa-check-circle';
+  } else if (type === 'error') {
+    color = '#F44336'; // Red
+    icon = 'fa-exclamation-circle';
+  } else if (type === 'warning') {
+    color = '#FF9800'; // Orange
+    icon = 'fa-exclamation-triangle';
+  }
+
+  // Create the popup content
+  popupContainer.innerHTML = `
+    <div class="custom-popup-content" style="
+      background-color: rgba(15, 15, 20, 0.95);
+      border-radius: 15px;
+      padding: 25px;
+      max-width: 400px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      border: 2px solid rgba(156, 39, 176, 0.4);
+      transform: scale(0.9);
+      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    ">
+      <div style="font-size: 40px; color: ${color}; margin-bottom: 15px;">
+        <i class="fas ${icon}"></i>
+      </div>
+      <h3 style="color: white; margin-bottom: 15px; font-size: 22px;">${title}</h3>
+      <p style="color: white; margin-bottom: 20px; font-size: 16px;">${message}</p>
+      <button class="btn custom-popup-close" style="
+        padding: 10px 25px;
+        background: linear-gradient(45deg, #9c27b0, #3f51b5);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s;
+      ">Close</button>
+    </div>
+  `;
+
+  // Add the popup to the document
+  document.body.appendChild(popupContainer);
+
+  // Force reflow to enable transition
+  void popupContainer.offsetWidth;
+
+  // Show the popup with animation
+  popupContainer.style.opacity = '1';
+  setTimeout(() => {
+    const content = popupContainer.querySelector('.custom-popup-content');
+    content.style.transform = 'scale(1)';
+  }, 10);
+
+  // Add event listener to close button
+  const closeBtn = popupContainer.querySelector('.custom-popup-close');
+  closeBtn.addEventListener('click', () => {
+    const content = popupContainer.querySelector('.custom-popup-content');
+    content.style.transform = 'scale(0.9)';
+    popupContainer.style.opacity = '0';
+    setTimeout(() => {
+      document.body.removeChild(popupContainer);
+    }, 300);
+  });
+
+  // Auto-close after 5 seconds for success messages
+  if (type === 'success') {
+    setTimeout(() => {
+      if (popupContainer.parentNode) {
+        const content = popupContainer.querySelector('.custom-popup-content');
+        content.style.transform = 'scale(0.9)';
+        popupContainer.style.opacity = '0';
+        setTimeout(() => {
+          if (popupContainer.parentNode) {
+            document.body.removeChild(popupContainer);
+          }
+        }, 300);
+      }
+    }, 5000);
+  }
+}
+
+// Modified function to handle login with custom popup
+function handleLoginForm(form) {
+  const formData = new FormData(form);
+  const email = formData.get('email');
+  const password = formData.get('password');
+  
+  console.log(`Login attempt with email: ${email}`);
+  
+  // Check if Firebase is available
+  if (typeof firebase !== 'undefined' && firebase.auth) {
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const originalBtnText = submitBtn.innerHTML;
+    submitBtn.innerHTML = 'Logging in...';
+    submitBtn.disabled = true;
+    
+    firebase.auth().signInWithEmailAndPassword(email, password)
+      .then((userCredential) => {
+        const user = userCredential.user;
+        console.log("User logged in:", user.email);
+        
+        // Store user email in session storage for page protection
+        sessionStorage.setItem('loggedInUser', user.email);
+        
+        // Show success popup
+        showCustomPopup('Login Successful', `Welcome back, ${user.email}!`, 'success');
+        
+        // User-specific redirects based on email after a short delay
+        setTimeout(() => {
+          if (user.email === 'akshaytest@gmail.com') {
+            window.location.href = 'page2.html';
+          } else if (user.email === 'ak2@gmail.com') {
+            window.location.href = 'page3.html';
+          } else {
+            // Default redirect for other authenticated users
+            window.location.href = 'dashboard.html';
+          }
+        }, 1500);
+      })
+      .catch((error) => {
+        console.error("Login error:", error.code, error.message);
+        
+        // Show error popup instead of alert
+        showCustomPopup('Login Failed', error.message, 'error');
+        
+        // Reset button state
+        submitBtn.innerHTML = originalBtnText;
+        submitBtn.disabled = false;
+      });
+  } else {
+    // Fallback if Firebase is not initialized
+    console.error("Firebase not available");
+    showCustomPopup('System Error', 'Login functionality is not available. Please try again later.', 'error');
+  }
+}
+
+// Add this to document ready to ensure we have the custom popup CSS
+document.addEventListener('DOMContentLoaded', function() {
+  // Add the custom popup styles to the document
+  const popupStyles = document.createElement('style');
+  popupStyles.textContent = `
+    .custom-popup-content button:hover {
+      opacity: 0.9;
+      transform: translateY(-2px);
+    }
+    
+    .custom-popup-content button:active {
+      transform: translateY(1px);
+    }
+    
+    @media (max-width: 768px) {
+      .custom-popup-content {
+        width: 90% !important;
+        padding: 20px !important;
+      }
+      
+      .custom-popup-content h3 {
+        font-size: 18px !important;
+      }
+      
+      .custom-popup-content p {
+        font-size: 14px !important;
+      }
+    }
+  `;
+  document.head.appendChild(popupStyles);
+  
+  // Connect mobile login button to the main login button functionality
+  const mobileLoginBtn = document.getElementById('login-btn-mobile');
+  const mainLoginBtn = document.getElementById('login-btn');
+  const loginModal = document.getElementById('login-modal');
+  
+  if (mobileLoginBtn && mainLoginBtn && loginModal) {
+    mobileLoginBtn.addEventListener('click', () => {
+      loginModal.style.display = 'block';
+      setTimeout(() => {
+        loginModal.classList.add('active');
+      }, 10);
+    });
+  }
 });
