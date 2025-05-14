@@ -342,7 +342,7 @@ function setupFormSubmissions() {
           fields: [],
           footer: {
             text: "Akaxorzo Website Submission",
-            icon_url: "https://i.imgur.com/yourlogo.png" // Replace with your logo URL
+            icon_url: "https://postimg.cc/cvs0th8H" // Replace with your logo URL
           },
           timestamp: new Date().toISOString()
         }]
