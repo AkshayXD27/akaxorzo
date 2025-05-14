@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Page 2 - Akaxorzo Admin</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Poppins:wght@300;400;700&display=swap" rel="stylesheet">
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="style.css">
+  
+  <!-- IMPROVED Page Protection Script with Auto Logout -->
+  <script>
+    // Auto logout configuration
+    const AUTO_LOGOUT_TIME = 5 * 60 * 1000; // 5 minutes in milliseconds
+    let autoLogoutTimer;
+    let lastActivityTime = new Date().getTime(); // Track last activity time
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      // Hide the entire body content initially
+      document.body.style.visibility = 'hidden';
+      
+      // Create and show loading overlay
+      const loadingOverlay = document.createElement('div');
+      loadingOverlay.style.position = 'fixed';
+      loadingOverlay.style.top = '0';
+      loadingOverlay.style.left = '0';
+      loadingOverlay.style.width = '100%';
+      loadingOverlay.style.height = '100%';
+      loadingOverlay.style.backgroundColor = '#121212';
+      loadingOverlay.style.display = 'flex';
+      loadingOverlay.style.flexDirection = 'column';
+      loadingOverlay.style.justifyContent = 'center';
+      loadingOverlay.style.alignItems = 'center';
+      loadingOverlay.style.zIndex = '9999';
+      loadingOverlay.innerHTML = `
+        <div style="color: white; font-family: 'Poppins', sans-serif; text-align: center;">
+          <div style="font-size: 24px; margin-bottom: 20px;">
+            <i class="fas fa-spinner fa-spin"></i>
+          </div>
+          <p>Verifying authentication...</p>
+        </div>
+      `;
+      document.body.appendChild(loadingOverlay);
+      
+      const currentUser = sessionStorage.getItem('loggedInUser');
+      
+      // Function to redirect with a message
+      function redirectWithMessage(message, redirectTo) {
+        loadingOverlay.innerHTML = `
+          <div style="color: white; font-family: 'Poppins', sans-serif; text-align: center; max-width: 80%;">
+            <div style="color: #F44336; font-size: 48px; margin-bottom: 20px;">
+              <i class="fas fa-exclamation-circle"></i>
+            </div>
+            <p style="font-size: 18px; margin-bottom: 20px;">${message}</p>
+            <p>Redirecting you to the login page...</p>
+          </div>
+        `;
+        
+        // Redirect after a short delay to allow reading the message
+        setTimeout(() => {
+          window.location.href = redirectTo || 'index.html';
+        }, 2000);
+      }
+      
+      // Check if user is logged in
+      if (!currentUser) {
+        // Not logged in, redirect to login page
+        redirectWithMessage('Please log in to access this page');
+        return;
+      }
+      
+      // Check if the logged-in user is authorized for this page
+      if (currentUser !== 'akshaytest@gmail.com') {
+        redirectWithMessage('You are not authorized to access this page', 
+          currentUser === 'ak2@gmail.com' ? 'page3.html' : 'index.html'
+        );
+        return;
+      }
+      
+      // If we get here, user is authenticated and authorized
+      // Remove the loading overlay and show the page content
+      setTimeout(() => {
+        document.body.removeChild(loadingOverlay);
+        document.body.style.visibility = 'visible';
+        
+        // Update user email display after authentication
+        const userEmailElement = document.getElementById('user-email');
+        if (userEmailElement && currentUser) {
+          userEmailElement.textContent = currentUser;
+        }
+        
+        // Set up logout functionality AFTER authentication is confirmed
+        setupLogout();
+        
+        // Start the auto logout timer
+        startAutoLogoutTimer();
+      }, 500);
+    });
+    
+    // Function to reset the auto logout timer
+    function resetAutoLogoutTimer() {
+      // Update last activity time
+      lastActivityTime = new Date().getTime();
+      
+      // Clear existing timer
+      clearTimeout(autoLogoutTimer);
+      
+      // Set auto logout timer
+      autoLogoutTimer = setTimeout(() => {
+        console.log('Auto logout triggered due to inactivity');
+        handleLogoutSuccess();
+      }, AUTO_LOGOUT_TIME);
+    }
+    
+    // Function to start the auto logout timer
+    function startAutoLogoutTimer() {
+      // Reset and start the timer
+      resetAutoLogoutTimer();
+      
+      // Add event listeners to reset the timer on user activity
+      const events = ['mousedown', 'keydown', 'scroll', 'touchstart'];
+      events.forEach(event => {
+        document.addEventListener(event, resetAutoLogoutTimer);
+      });
+      
+      // Start session timer display
+      updateSessionTimerDisplay();
+      
+      // Update timer display every second
+      setInterval(updateSessionTimerDisplay, 1000);
+    }
+    
+    // Update session timer display
+    function updateSessionTimerDisplay() {
+      const sessionTimerElement = document.getElementById('session-timer');
+      if (!sessionTimerElement) return;
+      
+      // Calculate time remaining
+      const now = new Date().getTime();
+      const logoutTime = lastActivityTime + AUTO_LOGOUT_TIME;
+      const timeRemaining = Math.max(0, logoutTime - now);
+      
+      // Format time as MM:SS
+      const minutes = Math.floor(timeRemaining / 60000);
+      const seconds = Math.floor((timeRemaining % 60000) / 1000);
+      
+      // Update the timer display
+      sessionTimerElement.innerHTML = `<i class="fas fa-clock" style="margin-right: 5px;"></i>${minutes}:${seconds.toString().padStart(2, '0')}`;
+      
+      // Change color based on time remaining
+      if (timeRemaining < 60000) { // Less than 1 minute
+        sessionTimerElement.style.backgroundColor = '#000000'; // Black
+      } else {
+        sessionTimerElement.style.backgroundColor = '#000000'; // Default color
+      }
+    }
+    
+    // Extracted logout setup function to ensure it runs at the right time
+    function setupLogout() {
+      // Find the logout button
+      const logoutBtn = document.getElementById('logout-btn');
+      
+      if (!logoutBtn) {
+        console.error('Logout button not found. Make sure you have an element with id="logout-btn"');
+        return;
+      }
+      
+      logoutBtn.addEventListener('click', function() {
+        console.log('Logout button clicked');
+        
+        // Try Firebase logout if available
+        if (typeof firebase !== 'undefined' && firebase.auth && firebase.auth()) {
+          try {
+            firebase.auth().signOut()
+              .then(() => {
+                console.log('User signed out successfully from Firebase');
+                handleLogoutSuccess();
+              })
+              .catch((error) => {
+                console.error('Firebase sign out error:', error);
+                // Still attempt local logout on Firebase error
+                handleLogoutSuccess();
+              });
+          } catch (e) {
+            console.error('Error during Firebase signout process:', e);
+            handleLogoutSuccess();
+          }
+        } else {
+          // Fallback for when Firebase is not available
+          console.log('Firebase not available, performing manual logout');
+          handleLogoutSuccess();
+        }
+      });
+    }
+    
+    // Common logout success handler
+    function handleLogoutSuccess() {
+      // Clear auto logout timer
+      clearTimeout(autoLogoutTimer);
+      
+      // Clear any stored user data
+      sessionStorage.removeItem('loggedInUser');
+      localStorage.removeItem('userToken'); // In case you use localStorage too
+      
+      // Clear any cookies if needed
+      document.cookie.split(";").forEach(function(c) {
+        document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+      });
+      
+      // Redirect to login page
+      console.log('Redirecting to login page...');
+      window.location.href = 'index.html';
+    }
+  </script>
+  
+  <!-- User Profile CSS -->
+  <style>
+    /* Main content container */
+    .main-content {
+      padding: 30px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    /* User profile section */
+    .user-profile-container {
+      display: flex;
+      background-color: #1e1e1e;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      margin-bottom: 30px;
+    }
+    
+    /* User avatar section */
+    .user-avatar-section {
+      flex: 0 0 250px;
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background-color: #242424;
+      border-right: 1px solid #333;
+    }
+    
+    .user-avatar {
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      overflow: hidden;
+      margin-bottom: 20px;
+      border: 3px solid #4a4a4a;
+      background-color: #333;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .user-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .user-avatar .avatar-placeholder {
+      font-size: 80px;
+      color: #555;
+    }
+    
+    /* User details section */
+    .user-details-section {
+      flex: 1;
+      padding: 30px;
+    }
+    
+    .user-details-header {
+      margin-bottom: 25px;
+      border-bottom: 1px solid #333;
+      padding-bottom: 15px;
+    }
+    
+    .user-details-header h2 {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 28px;
+      color: #ffffff;
+      margin-bottom: 10px;
+    }
+    
+    .user-details-content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-gap: 20px;
+    }
+    
+    .user-details-item {
+      margin-bottom: 15px;
+    }
+    
+    .user-details-label {
+      font-family: 'Poppins', sans-serif;
+      font-size: 14px;
+      font-weight: 300;
+      color: #9e9e9e;
+      margin-bottom: 5px;
+    }
+    
+    .user-details-value {
+      font-family: 'Poppins', sans-serif;
+      font-size: 16px;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+    }
+    
+    .status-indicator {
+      display: inline-flex;
+      align-items: center;
+    }
+    
+    .status-granted {
+      color: #4CAF50;
+      margin-right: 8px;
+    }
+    
+    .status-denied {
+      color: #F44336;
+      margin-right: 8px;
+    }
+    
+    .status-na {
+      color: #FFC107;
+      margin-right: 8px;
+    }
+    
+    /* Buttons */
+    .user-actions {
+      margin-top: 30px;
+      display: flex;
+      gap: 15px;
+    }
+    
+    .user-action-btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      transition: all 0.3s ease;
+    }
+    
+    .user-action-btn i {
+      margin-right: 8px;
+    }
+    
+    .btn-primary {
+      background-color: #5C6BC0;
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background-color: #3F51B5;
+    }
+    
+    .btn-secondary {
+      background-color: #4CAF50;
+      color: white;
+    }
+    
+    .btn-secondary:hover {
+      background-color: #388E3C;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .user-profile-container {
+        flex-direction: column;
+      }
+      
+      .user-avatar-section {
+        flex: 0 0 auto;
+        border-right: none;
+        border-bottom: 1px solid #333;
+      }
+      
+      .user-details-content {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    /* Spinning mod badge animation */
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .mod-badge {
+      display: inline-block;
+      animation: spin 4s linear infinite;
+    }
+    
+    .header {
+      background-color: #1e1e1e;
+      padding: 20px 0;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    }
+    
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+    
+    .logo {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 700;
+      font-size: 20px;
+      color: #ffffff;
+    }
+    
+    .user-info {
+      display: flex;
+      align-items: center;
+    }
+    
+    #user-email {
+      margin-right: 15px;
+      font-family: 'Poppins', sans-serif;
+      color: #e0e0e0;
+    }
+    
+    .btn {
+      padding: 8px 16px;
+      background-color: #f44336;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-family: 'Poppins', sans-serif;
+      font-size: 14px;
+      transition: background-color 0.3s;
+    }
+    
+    .btn:hover {
+      background-color: #d32f2f;
+    }
+    
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #121212;
+      color: #f5f5f5;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <nav>
+      <div class="logo">AKAXORZO DASHBOARD</div>
+      <div class="user-info">
+        <span id="user-email">akshaytest@gmail.com</span>
+        <span id="session-timer" style="margin: 0 15px; padding: 3px 8px; background-color: #f1f1f1; border-radius: 4px; font-size: 14px;">
+          <i class="fas fa-clock" style="margin-right: 5px;"></i>5:00
+        </span>
+        <button id="logout-btn" class="btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+      </div>
+    </nav>
+  </header>
+
+  <div class="main-content">
+    <div class="user-profile-container">
+      <!-- User Avatar Section -->
+      <div class="user-avatar-section">
+        <div class="user-avatar">
+          <img src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png" alt="User Profile" />
+        </div>
+        <h3 style="color: #ffffff; margin-top: 10px; text-align: center;">XYZ</h3>
+        <p style="color: #9e9e9e; font-size: 14px; text-align: center;">Community Member</p>
+      </div>
+      
+      <!-- User Details Section -->
+      <div class="user-details-section">
+        <div class="user-details-header">
+          <h2>User Profile</h2>
+          <p>User information and moderation status</p>
+        </div>
+        
+        <div class="user-details-content">
+          <!-- First column -->
+          <div>
+            <div class="user-details-item">
+              <div class="user-details-label">Username</div>
+              <div class="user-details-value">XYZ</div>
+            </div>
+            
+            <div class="user-details-item">
+              <div class="user-details-label">YouTube Username</div>
+              <div class="user-details-value">xyz</div>
+            </div>
+            
+            <div class="user-details-item">
+              <div class="user-details-label">Discord Username</div>
+              <div class="user-details-value">
+                <span class="status-indicator">
+                  <i class="fas fa-minus-circle status-na"></i>
+                </span>
+                Not on Discord
+              </div>
+            </div>
+            
+            <div class="user-details-item">
+              <div class="user-details-label">YouTube Moderator</div>
+              <div class="user-details-value">
+                <span class="status-indicator">
+                  <i class="fas fa-check-circle status-granted"></i>
+                </span>
+                Granted
+                <span class="mod-badge" style="margin-left: 8px; color: #FFC107;">
+                  <i class="fas fa-shield-alt"></i>
+                </span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Second column -->
+          <div>
+            <div class="user-details-item">
+              <div class="user-details-label">Discord Moderator</div>
+              <div class="user-details-value">
+                <span class="status-indicator">
+                  <i class="fas fa-check-circle status-granted"></i>
+                </span>
+                Granted
+                <span class="mod-badge" style="margin-left: 8px; color: #7289DA;">
+                  <i class="fas fa-shield-alt"></i>
+                </span>
+              </div>
+            </div>
+            
+            <div class="user-details-item">
+              <div class="user-details-label">Games Played</div>
+              <div class="user-details-value">
+                <span class="status-indicator">
+                  <i class="fas fa-minus-circle status-na"></i>
+                </span>
+                Not available
+              </div>
+            </div>
+            
+            <div class="user-details-item">
+              <div class="user-details-label">Events Joined</div>
+              <div class="user-details-value">2</div>
+            </div>
+            
+            <div class="user-details-item">
+              <div class="user-details-label">MVP Titles</div>
+              <div class="user-details-value">
+                <span class="status-indicator">
+                  <i class="fas fa-minus-circle status-na"></i>
+                </span>
+                Currently N/A
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Action buttons -->
+        <div class="user-actions">
+          <button class="user-action-btn btn-primary" onclick="window.location.href='mod.html'">
+            <i class="fas fa-user-shield"></i> Apply for Mod
+          </button>
+          <button class="user-action-btn btn-secondary">
+            <i class="fas fa-edit"></i> Update User Data
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
