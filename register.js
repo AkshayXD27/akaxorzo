@@ -1,31 +1,40 @@
-// firebase.js (recommended to extract this setup)
-import { initializeApp } from "firebase/app";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
 
-// ✅ Use environment variables correctly (with Vite)
-const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID,
-  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
-};
+  const firebaseConfig = {
+    apiKey: "AIzaSyBwHdL5Pl6Zp7QpiaIvj8N34tip88K04Ms",
+    authDomain: "akaxorzo-dd5eb.firebaseapp.com",
+    projectId: "akaxorzo-dd5eb",
+    storageBucket: "akaxorzo-dd5eb.firebasestorage.app",
+    messagingSenderId: "633801465984",
+    appId: "1:633801465984:web:72e2d1ce6e17b2a6648665",
+    measurementId: "G-EVFCT5Q7NF"
+  };
 
-// ✅ Initialize Firebase app once
-const app = initializeApp(firebaseConfig);
+let auth;
 
-// ✅ Initialize Auth
-const auth = getAuth(app);
-
-// Optional: Auth state listener
-onAuthStateChanged(auth, (user) => {
-  if (user) {
-    console.log("User signed in:", user.email);
+document.addEventListener('DOMContentLoaded', function() {
+  console.log("Initializing Firebase...");
+  
+  // Check if Firebase is loaded
+  if (typeof firebase !== 'undefined') {
+    // Initialize Firebase
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    
+    // Get auth instance
+    auth = firebase.auth();
+    console.log("Firebase initialized successfully");
+    
+    // Listen for auth state changes (optional)
+    auth.onAuthStateChanged((user) => {
+      if (user) {
+        console.log("User is signed in:", user.email);
+        // You could update UI here to show logged-in state
+      } else {
+        console.log("User is signed out");
+      }
+    });
   } else {
-    console.log("User signed out");
+    console.warn("Firebase SDK not loaded - check your script tags");
   }
 });
-
-export { auth };
