@@ -62,11 +62,11 @@
       <span class="close-modal">&times;</span>
       <h2 class="modal-title">Login to Your Account</h2>
       <form id="login-form">
-        <input type="text" placeholder="Username" required>
-        <input type="password" placeholder="Password" required>
+        <input type="email" name="email" placeholder="Email" required>
+        <input type="password" name="password" placeholder="Password" required>
         <button type="submit">Log In</button>
       </form>
-      <p style="text-align: center; margin-top: 15px; color: #aaa;">This for admins only </p>
+      <p style="text-align: center; margin-top: 15px; color: #aaa;">This is for admins only</p>
     </div>
   </div>
   
@@ -107,40 +107,26 @@
         <div style="margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1);">
           <h3 style="color: #9c27b0;">Currently No Upcoming Events</h3>
         </div>
-        
-        
       </div>
     </div>
   </div>
   
-  <!-- JavaScript for connecting mobile buttons to desktop actions -->
+  <!-- Connect mobile buttons to desktop actions -->
   <script>
-    // Connect mobile buttons to desktop button actions
-    document.addEventListener('DOMContentLoaded', function() {
-      const buttonPairs = {
-        'discord-btn-mobile': 'discord-btn',
-        'youtube-btn-mobile': 'youtube-btn',
-        'events-btn-mobile': 'events-btn',
-        'login-btn-mobile': 'login-btn',
-        'games-btn-mobile': 'games-btn'
-      };
-      
-      // For each mobile button, trigger the click of its desktop counterpart
-      Object.entries(buttonPairs).forEach(([mobileId, desktopId]) => {
-        const mobileBtn = document.getElementById(mobileId);
-        const desktopBtn = document.getElementById(desktopId);
-        
-        if (mobileBtn && desktopBtn) {
-          mobileBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            desktopBtn.click();
-          });
-        }
-      });
-    });
+    // Mobile button handling will be done in the main script
   </script>
   
-  <!-- Custom JavaScript -->
+  <!-- Firebase SDK (must be loaded before any scripts that use it) -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  
+  <!-- Custom Scripts -->
+  <script src="register.js"></script>
   <script src="script.js"></script>
+  
+  <!-- Debug helper to confirm scripts are loaded -->
+  <script>
+    console.log("All scripts loaded");
+  </script>
 </body>
 </html>
