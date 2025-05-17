@@ -624,3 +624,23 @@ footer {
     grid-template-columns: 1fr;
   }
 }
+@media (max-width: 768px) {
+  .main-content {
+    padding-top: 100px; /* add enough padding to push content below header */
+  }
+
+  #session-timer {
+    font-size: 12px;
+    padding: 4px 10px;
+  }
+
+  #logout-btn {
+    font-size: 12px;
+    padding: 6px 12px;
+  }
+
+  #user-email {
+    font-size: 12px;
+    padding: 4px 10px;
+  }
+}
