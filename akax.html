@@ -1026,7 +1026,7 @@
                   <span class="status-indicator">
                     <i class="fas fa-fire status-granted"></i>
                   </span>
-                  12 Day Streak
+                  1 Day Streak
                 </div>
                 <div class="attendance-streak">
                   <div class="streak-day"></div>
@@ -1055,7 +1055,7 @@
                   <span class="status-indicator">
                     <i class="fas fa-check-circle status-granted"></i>
                   </span>
-                  May 16, 2025 (Yesterday)
+                  May 17, 2025
                 </div>
               </div>
             </div>
@@ -1069,17 +1069,18 @@
           </div>
           
           <div class="activity-item">
-            <div class="activity-date">May 16, 2025</div>
+            <div class="activity-date">May 17, 2025</div>
             <div class="activity-type">
-              <i class="fas fa-gamepad"></i> Game Stream: Minecraft Community Build
-              <span class="badge"><i class="fas fa-heart"></i> Donated</span>
+              <i class="fas fa-gamepad"></i> Game Stream: Roblox MM2 Live
+              
             </div>
           </div>
           
-          <div class="activity-item">
+          <!-- <div class="activity-item">
             <div class="activity-date">May 14, 2025</div>
             <div class="activity-type">
               <i class="fas fa-microphone"></i> Podcast: Gaming Industry News
+              <span class="badge"><i class="fas fa-heart"></i> Donated</span>
               <span class="badge"><i class="fas fa-comments"></i> Active Chat</span>
             </div>
           </div>
@@ -1098,12 +1099,12 @@
               <i class="fas fa-users"></i> Community Day: Q&A Session
               <span class="badge"><i class="fas fa-star"></i> Moderator</span>
             </div>
-          </div>
+          </div> /*
           
           <div class="gif-container" style="margin-top: 20px;">
             <img src="/api/placeholder/600/150" alt="Activity Statistics" />
           </div>
-        </div>
+        </div> -->
         
         <!-- Action buttons -->
         <div class="user-actions">
@@ -1116,9 +1117,7 @@
         </div>
         
         <!-- Animated GIF -->
-        <div class="gif-container" style="margin-top: 30px;">
-          <img src="/api/placeholder/600/200" alt="Akaxorzo Community" />
-        </div>
+       
       </div>
     </div>
     
@@ -1126,14 +1125,11 @@
     <script>
       // Sample data for demonstration purposes
       const attendanceData = {
-        lastAttended: "May 16, 2025",
-        streak: 12,
-        streakDays: [true, true, true, true, true, true, true, false, true, true, true, true],
+        lastAttended: "May 17, 2025",
+        streak: 1,
+        streakDays: [true],
         recentActivity: [
-          { date: "May 16, 2025", type: "Game Stream", details: "Minecraft Community Build", badges: ["Donated"] },
-          { date: "May 14, 2025", type: "Podcast", details: "Gaming Industry News", badges: ["Active Chat"] },
-          { date: "May 12, 2025", type: "Game Stream", details: "Fortnite Tournament", badges: ["Won Giveaway"] },
-          { date: "May 10, 2025", type: "Community Day", details: "Q&A Session", badges: ["Moderator"] }
+          { date: "May 17, 2025", type: "EVENT", details: "MM2 BOYS VS GIRLS", badges: [] },
         ]
       };
       
@@ -1157,5 +1153,6 @@
       });
     </script>
   </div>
+  <script src="securepages.js"></script>
 </body>
 </html>
