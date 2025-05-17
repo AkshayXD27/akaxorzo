@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  
   <title>Akaxorzo ID</title>
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -229,7 +230,190 @@
       min-height: 100vh;
       background-image: linear-gradient(to bottom, #0a0a0a, #121212, #0a0a0a);
     }
+     @media (max-width: 992px) {
+      .user-profile-container {
+        flex-direction: column;
+      }
+      
+      .user-avatar-section {
+        flex: 0 0 auto;
+        border-right: none;
+        border-bottom: 1px solid #333;
+        padding-bottom: 30px;
+      }
+      
+      .user-details-content {
+        grid-template-columns: 1fr;
+      }
+    }
     
+    @media (max-width: 768px) {
+      .main-content {
+        padding: 15px;
+      }
+      
+      .header {
+        padding: 10px 0;
+      }
+      
+      nav {
+        padding: 0 10px;
+      }
+      
+      .logo {
+        font-size: 18px;
+      }
+      
+      .user-info {
+        flex-wrap: wrap;
+        justify-content: flex-end;
+      }
+      
+      #user-email {
+        font-size: 12px;
+        padding: 4px 8px;
+        margin-right: 8px;
+      }
+      
+      #session-timer {
+        font-size: 12px;
+        padding: 4px 8px;
+        margin: 0 8px 0 0;
+      }
+      
+      .btn {
+        padding: 6px 12px;
+        font-size: 12px;
+      }
+      
+      .user-stats {
+        flex-wrap: wrap;
+      }
+      
+      .user-stat-item {
+        flex: 0 0 50%;
+        margin-bottom: 15px;
+      }
+      
+      .activity-item {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      
+      .activity-date {
+        margin-bottom: 5px;
+      }
+      
+      .user-actions {
+        flex-direction: column;
+      }
+      
+      .user-action-btn {
+        width: 100%;
+      }
+      
+      .user-avatar-section {
+        padding: 25px 15px;
+      }
+      
+      .user-avatar {
+        width: 120px;
+        height: 120px;
+      }
+      
+      .user-avatar-section h3 {
+        font-size: 20px;
+      }
+      
+      .user-role {
+        font-size: 14px;
+      }
+      
+      .user-details-section {
+        padding: 25px 15px;
+      }
+      
+      .user-details-header h2 {
+        font-size: 22px;
+      }
+      
+      .user-details-header p {
+        font-size: 14px;
+      }
+      
+      .user-details-item {
+        padding: 10px;
+      }
+      
+      .item-icon {
+        width: 32px;
+        height: 32px;
+        font-size: 14px;
+      }
+      
+      .user-details-value {
+        font-size: 14px;
+      }
+      
+      .badge {
+        font-size: 10px;
+        padding: 2px 6px;
+      }
+    }
+    
+    /* Small phone screens */
+    @media (max-width: 480px) {
+      .header {
+        padding: 8px 0;
+      }
+      
+      .logo {
+        font-size: 16px;
+      }
+      
+      .user-info {
+        margin-top: 8px;
+        justify-content: flex-end;
+        width: 100%;
+      }
+      
+      nav {
+        flex-wrap: wrap;
+      }
+      
+      #user-email, #session-timer {
+        margin-bottom: 8px;
+      }
+      
+      .user-avatar {
+        width: 100px;
+        height: 100px;
+      }
+      
+      .user-stat-value {
+        font-size: 16px;
+      }
+      
+      .user-stat-label {
+        font-size: 10px;
+      }
+      
+      .user-avatar-section h3 {
+        font-size: 18px;
+      }
+      
+      .user-role {
+        font-size: 12px;
+      }
+      
+      .user-details-header h2 {
+        font-size: 18px;
+      }
+      
+      .user-details-header p {
+        font-size: 12px;
+      }
+    }
     /* Header styles */
     .header {
       background-color: rgba(20, 20, 20, 0.95);
@@ -1146,5 +1330,31 @@
     </script>
   </div>
   <script src="securepages.js"></script>
+    <script>
+  // Force initial scaling for mobile
+  document.addEventListener('DOMContentLoaded', function() {
+    // Handle mobile nav view
+    if (window.innerWidth <= 480) {
+      // Adjust layout for very small screens
+      const userInfo = document.querySelector('.user-info');
+      const nav = document.querySelector('nav');
+      
+      if (userInfo && nav) {
+        nav.style.flexDirection = 'column';
+        nav.style.alignItems = 'flex-start';
+        userInfo.style.marginTop = '10px';
+        userInfo.style.justifyContent = 'space-between';
+        userInfo.style.width = '100%';
+      }
+    }
+    
+    // Prevent zoom on inputs for iOS devices
+    document.addEventListener('touchstart', function(event) {
+      if (event.target.tagName === 'INPUT' || event.target.tagName === 'SELECT' || event.target.tagName === 'TEXTAREA') {
+        event.target.style.fontSize = '16px';
+      }
+    }, false);
+  });
+</script>
 </body>
 </html>
