@@ -630,7 +630,7 @@ function handleLoginForm(form) {
         
         // User-specific redirects based on email after a short delay
         setTimeout(() => {
-          if (user.email === 'akshaytest@gmail.com') {
+          if (user.email === 'akax@gmail.com') {
             window.location.href = 'akax.html';
           } else if (user.email === 'ak2@gmail.com') {
             window.location.href = 'page3.html';
