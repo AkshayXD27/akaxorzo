@@ -2,7 +2,7 @@
 function setupSecurePageProtection() {
   // Create an object with authorized pages and their allowed users
   const pageAccess = {
-    'akax.html': ['akshaytest@gmail.com'],
+    'akax.html': ['akax@gmail.com'],
     'page3.html': ['ak2@gmail.com'],
     // Add more pages and their authorized users as needed
   };
