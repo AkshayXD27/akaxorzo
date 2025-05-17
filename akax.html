@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Page 2 - Akaxorzo Admin</title>
+  <title>Akaxorzo ID</title>
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -76,14 +76,6 @@
       if (!currentUser) {
         // Not logged in, redirect to login page
         redirectWithMessage('Please log in to access this page');
-        return;
-      }
-      
-      // Check if the logged-in user is authorized for this page
-      if (currentUser !== 'akax@gmail.com') {
-        redirectWithMessage('You are not authorized to access this page', 
-          currentUser === 'ak2@gmail.com' ? 'page3.html' : 'index.html'
-        );
         return;
       }
       
