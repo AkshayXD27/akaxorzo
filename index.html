@@ -563,7 +563,20 @@
     <div class="social-icon"><i class="fab fa-twitter"></i></div>
   </div>
   
-  
+  <!-- Login Modal -->
+  <div class="modal" id="login-modal">
+    <div class="modal-content">
+      <span class="close-modal">&times;</span>
+      <h2 class="modal-title">Login to Your Account</h2>
+      <form id="login-form">
+        <input type="email" name="email" placeholder="Email" required>
+        <input type="password" name="password" placeholder="Password" required>
+        <button type="submit">Log In</button>
+      </form>
+      <p class="auth-switch">Don't have an account? <a id="switch-to-signup">Sign up here</a></p>
+      <p style="text-align: center; margin-top: 10px; color: #aaa; font-size: 0.9rem;">Admin login available</p>
+    </div>
+  </div>
   
   <!-- Sign Up Modal -->
   <div class="modal" id="signup-modal">
@@ -581,7 +594,34 @@
     </div>
   </div>
   
- 
+  <!-- Friend Request Modal -->
+  <div class="modal" id="friend-modal">
+    <div class="modal-content">
+      <span class="close-modal">&times;</span>
+      <h2 class="modal-title">Send Friend Request</h2>
+      <form id="friend-form">
+        <input type="text" name="username" placeholder="Your Username" required>
+        <input type="text" name="email" placeholder="Your Email" required>
+        <textarea name="message" placeholder="Message (Optional)" rows="4"></textarea>
+        <button type="submit">Send Request</button>
+      </form>
+    </div>
+  </div>
+  
+  <!-- Ban Appeal Modal -->
+  <div class="modal" id="appeal-modal">
+    <div class="modal-content">
+      <span class="close-modal">&times;</span>
+      <h2 class="modal-title">Submit Ban Appeal</h2>
+      <form id="appeal-form">
+        <input type="text" name="username" placeholder="Your Username" required>
+        <input type="text" name="discord" placeholder="Discord ID" required>
+        <textarea name="reason" placeholder="Reason for appeal..." rows="4" required></textarea>
+        <button type="submit">Submit Appeal</button>
+      </form>
+    </div>
+  </div>
+  
   
   <!-- Events Modal -->
   <div class="modal" id="events-modal">
@@ -596,17 +636,16 @@
     </div>
   </div>
 
-  <script>
+   <script>
     // Modal functionality
     const modals = {
       
       'signup-btn': 'signup-modal',
       'signup-btn-mobile': 'signup-modal',
-      
+      'friend-btn': 'friend-modal',
       'events-btn': 'events-modal',
       'events-btn-mobile': 'events-modal'
     };
-
 
     // Open modals
     Object.keys(modals).forEach(btnId => {
@@ -614,20 +653,6 @@
       if (btn) {
         btn.addEventListener('click', () => {
           document.getElementById(modals[btnId]).style.display = 'block';
-        });
-      }
-    });
-
-    // Handle external links
-    Object.keys(links).forEach(btnId => {
-      const btn = document.getElementById(btnId);
-      if (btn && !modals[btnId]) {
-        btn.addEventListener('click', () => {
-          if (links[btnId].startsWith('http')) {
-            window.open(links[btnId], '_blank');
-          } else {
-            console.log('Navigate to:', links[btnId]);
-          }
         });
       }
     });
@@ -657,6 +682,19 @@
       document.getElementById('login-modal').style.display = 'block';
     });
 
+    Object.keys(links).forEach(btnId => {
+      const btn = document.getElementById(btnId);
+      if (btn && !modals[btnId]) {
+        btn.addEventListener('click', () => {
+          if (links[btnId].startsWith('http')) {
+            window.open(links[btnId], '_blank');
+          } else {
+            console.log('Navigate to:', links[btnId]);
+          }
+        });
+      }
+    });
+
     // Form submissions
     document.getElementById('signup-form').addEventListener('submit', (e) => {
       const password = e.target.password.value;
@@ -668,11 +706,17 @@
         return;
       }
       
+      // Netlify will handle the form submission
       console.log('Signup form submitted');
     });
 
     console.log("All scripts loaded");
   </script>
+  <!-- Firebase SDK (must be loaded before any scripts that use it) -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  
+  <!-- Custom Scripts -->
   <script src="register.js"></script>
   <script src="script.js"></script>
 </body>
