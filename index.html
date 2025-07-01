@@ -682,18 +682,7 @@
       document.getElementById('login-modal').style.display = 'block';
     });
 
-    Object.keys(links).forEach(btnId => {
-      const btn = document.getElementById(btnId);
-      if (btn && !modals[btnId]) {
-        btn.addEventListener('click', () => {
-          if (links[btnId].startsWith('http')) {
-            window.open(links[btnId], '_blank');
-          } else {
-            console.log('Navigate to:', links[btnId]);
-          }
-        });
-      }
-    });
+   
 
     // Form submissions
     document.getElementById('signup-form').addEventListener('submit', (e) => {
