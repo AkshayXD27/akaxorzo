@@ -594,33 +594,7 @@
     </div>
   </div>
   
-  <!-- Friend Request Modal -->
-  <div class="modal" id="friend-modal">
-    <div class="modal-content">
-      <span class="close-modal">&times;</span>
-      <h2 class="modal-title">Send Friend Request</h2>
-      <form id="friend-form">
-        <input type="text" name="username" placeholder="Your Username" required>
-        <input type="text" name="email" placeholder="Your Email" required>
-        <textarea name="message" placeholder="Message (Optional)" rows="4"></textarea>
-        <button type="submit">Send Request</button>
-      </form>
-    </div>
-  </div>
-  
-  <!-- Ban Appeal Modal -->
-  <div class="modal" id="appeal-modal">
-    <div class="modal-content">
-      <span class="close-modal">&times;</span>
-      <h2 class="modal-title">Submit Ban Appeal</h2>
-      <form id="appeal-form">
-        <input type="text" name="username" placeholder="Your Username" required>
-        <input type="text" name="discord" placeholder="Discord ID" required>
-        <textarea name="reason" placeholder="Reason for appeal..." rows="4" required></textarea>
-        <button type="submit">Submit Appeal</button>
-      </form>
-    </div>
-  </div>
+ 
   
   <!-- Events Modal -->
   <div class="modal" id="events-modal">
@@ -638,25 +612,14 @@
   <script>
     // Modal functionality
     const modals = {
-      'login-btn': 'login-modal',
-      'login-btn-mobile': 'login-modal',
+      
       'signup-btn': 'signup-modal',
       'signup-btn-mobile': 'signup-modal',
-      'friend-btn': 'friend-modal',
-      'appeal-btn': 'appeal-modal',
+      
       'events-btn': 'events-modal',
       'events-btn-mobile': 'events-modal'
     };
 
-    const links = {
-      'discord-btn': 'https://discord.gg/your-server',
-      'discord-btn-mobile': 'https://discord.gg/your-server',
-      'youtube-btn': 'https://youtube.com/your-channel',
-      'youtube-btn-mobile': 'https://youtube.com/your-channel',
-      'games-btn': '/games',
-      'games-btn-mobile': '/games',
-      'subscribe-btn': 'https://youtube.com/your-channel'
-    };
 
     // Open modals
     Object.keys(modals).forEach(btnId => {
@@ -723,5 +686,7 @@
 
     console.log("All scripts loaded");
   </script>
+  <script src="register.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
