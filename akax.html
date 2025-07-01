@@ -1,727 +1,1360 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Akaxorzo</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  
+  <title>Akaxorzo ID</title>
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Poppins:wght@300;400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Poppins:wght@300;400;500;700&display=swap" rel="stylesheet">
   <!-- Font Awesome for icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="style.css">
+  
+  <!-- IMPROVED Page Protection Script with Auto Logout -->
+  <script>
+    // Auto logout configuration
+    const AUTO_LOGOUT_TIME = 5 * 60 * 1000; // 5 minutes in milliseconds
+    let autoLogoutTimer;
+    let lastActivityTime = new Date().getTime(); // Track last activity time
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      // Hide the entire body content initially
+      document.body.style.visibility = 'hidden';
+      
+      // Create and show loading overlay
+      const loadingOverlay = document.createElement('div');
+      loadingOverlay.style.position = 'fixed';
+      loadingOverlay.style.top = '0';
+      loadingOverlay.style.left = '0';
+      loadingOverlay.style.width = '100%';
+      loadingOverlay.style.height = '100%';
+      loadingOverlay.style.backgroundColor = '#121212';
+      loadingOverlay.style.display = 'flex';
+      loadingOverlay.style.flexDirection = 'column';
+      loadingOverlay.style.justifyContent = 'center';
+      loadingOverlay.style.alignItems = 'center';
+      loadingOverlay.style.zIndex = '9999';
+      loadingOverlay.innerHTML = `
+        <div style="color: white; font-family: 'Poppins', sans-serif; text-align: center;">
+          <div style="font-size: 24px; margin-bottom: 20px;">
+            <i class="fas fa-spinner fa-spin"></i>
+          </div>
+          <p>Verifying authentication...</p>
+        </div>
+      `;
+      document.body.appendChild(loadingOverlay);
+      
+      const currentUser = sessionStorage.getItem('loggedInUser');
+      
+      // Function to redirect with a message
+      function redirectWithMessage(message, redirectTo) {
+        loadingOverlay.innerHTML = `
+          <div style="color: white; font-family: 'Poppins', sans-serif; text-align: center; max-width: 80%;">
+            <div style="color: #F44336; font-size: 48px; margin-bottom: 20px;">
+              <i class="fas fa-exclamation-circle"></i>
+            </div>
+            <p style="font-size: 18px; margin-bottom: 20px;">${message}</p>
+            <p>Redirecting you to the login page...</p>
+          </div>
+        `;
+        
+        // Redirect after a short delay to allow reading the message
+        setTimeout(() => {
+          window.location.href = redirectTo || 'index.html';
+        }, 2000);
+      }
+      
+      // Check if user is logged in
+      if (!currentUser) {
+        // Not logged in, redirect to login page
+        redirectWithMessage('Please log in to access this page');
+        return;
+      }
+      
+      // If we get here, user is authenticated and authorized
+      // Remove the loading overlay and show the page content
+      setTimeout(() => {
+        document.body.removeChild(loadingOverlay);
+        document.body.style.visibility = 'visible';
+        
+        // Update user email display after authentication
+        const userEmailElement = document.getElementById('user-email');
+        if (userEmailElement && currentUser) {
+          userEmailElement.textContent = currentUser;
+        }
+        
+        // Set up logout functionality AFTER authentication is confirmed
+        setupLogout();
+        
+        // Start the auto logout timer
+        startAutoLogoutTimer();
+      }, 500);
+    });
+    
+    // Function to reset the auto logout timer
+    function resetAutoLogoutTimer() {
+      // Update last activity time
+      lastActivityTime = new Date().getTime();
+      
+      // Clear existing timer
+      clearTimeout(autoLogoutTimer);
+      
+      // Set auto logout timer
+      autoLogoutTimer = setTimeout(() => {
+        console.log('Auto logout triggered due to inactivity');
+        handleLogoutSuccess();
+      }, AUTO_LOGOUT_TIME);
+    }
+    
+    // Function to start the auto logout timer
+    function startAutoLogoutTimer() {
+      // Reset and start the timer
+      resetAutoLogoutTimer();
+      
+      // Add event listeners to reset the timer on user activity
+      const events = ['mousedown', 'keydown', 'scroll', 'touchstart'];
+      events.forEach(event => {
+        document.addEventListener(event, resetAutoLogoutTimer);
+      });
+      
+      // Start session timer display
+      updateSessionTimerDisplay();
+      
+      // Update timer display every second
+      setInterval(updateSessionTimerDisplay, 1000);
+    }
+    
+    // Update session timer display
+    function updateSessionTimerDisplay() {
+      const sessionTimerElement = document.getElementById('session-timer');
+      if (!sessionTimerElement) return;
+      
+      // Calculate time remaining
+      const now = new Date().getTime();
+      const logoutTime = lastActivityTime + AUTO_LOGOUT_TIME;
+      const timeRemaining = Math.max(0, logoutTime - now);
+      
+      // Format time as MM:SS
+      const minutes = Math.floor(timeRemaining / 60000);
+      const seconds = Math.floor((timeRemaining % 60000) / 1000);
+      
+      // Update the timer display
+      sessionTimerElement.innerHTML = `<i class="fas fa-clock" style="margin-right: 5px;"></i>${minutes}:${seconds.toString().padStart(2, '0')}`;
+      
+      // Change color based on time remaining
+      if (timeRemaining < 60000) { // Less than 1 minute
+        sessionTimerElement.style.backgroundColor = '#f44336'; // Red
+        sessionTimerElement.style.color = 'white';
+      } else {
+        sessionTimerElement.style.backgroundColor = '#2d2d2d'; // Default color
+        sessionTimerElement.style.color = '#f1f1f1';
+      }
+    }
+    
+    // Extracted logout setup function to ensure it runs at the right time
+    function setupLogout() {
+      // Find the logout button
+      const logoutBtn = document.getElementById('logout-btn');
+      
+      if (!logoutBtn) {
+        console.error('Logout button not found. Make sure you have an element with id="logout-btn"');
+        return;
+      }
+      
+      logoutBtn.addEventListener('click', function() {
+        console.log('Logout button clicked');
+        
+        // Try Firebase logout if available
+        if (typeof firebase !== 'undefined' && firebase.auth && firebase.auth()) {
+          try {
+            firebase.auth().signOut()
+              .then(() => {
+                console.log('User signed out successfully from Firebase');
+                handleLogoutSuccess();
+              })
+              .catch((error) => {
+                console.error('Firebase sign out error:', error);
+                // Still attempt local logout on Firebase error
+                handleLogoutSuccess();
+              });
+          } catch (e) {
+            console.error('Error during Firebase signout process:', e);
+            handleLogoutSuccess();
+          }
+        } else {
+          // Fallback for when Firebase is not available
+          console.log('Firebase not available, performing manual logout');
+          handleLogoutSuccess();
+        }
+      });
+    }
+    
+    // Common logout success handler
+    function handleLogoutSuccess() {
+      // Clear auto logout timer
+      clearTimeout(autoLogoutTimer);
+      
+      // Clear any stored user data
+      sessionStorage.removeItem('loggedInUser');
+      localStorage.removeItem('userToken'); // In case you use localStorage too
+      
+      // Clear any cookies if needed
+      document.cookie.split(";").forEach(function(c) {
+        document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+      });
+      
+      // Redirect to login page
+      console.log('Redirecting to login page...');
+      window.location.href = 'index.html';
+    }
+  </script>
+  
+  <!-- User Profile CSS -->
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    html, body {
-      margin: 0;
-      padding: 0;
-      height: 100%;
+    /* Base styles */
+    body {
       font-family: 'Poppins', sans-serif;
-      background: linear-gradient(135deg, #0a0a0a 0%, #1a0000 25%, #000000 50%, #2d0000 75%, #0f0f0f 100%);
+      background-color: #0a0a0a;
+      color: #f5f5f5;
+      margin: 0;
+      padding: 0;
       min-height: 100vh;
-      color: white;
-      overflow-x: hidden;
+      background-image: linear-gradient(to bottom, #0a0a0a, #121212, #0a0a0a);
     }
-
-    .top-left, .top-right, .right-side {
-      position: absolute;
-      display: flex;
-      gap: 15px;
+     @media (max-width: 992px) {
+      .user-profile-container {
+        flex-direction: column;
+      }
+      
+      .user-avatar-section {
+        flex: 0 0 auto;
+        border-right: none;
+        border-bottom: 1px solid #333;
+        padding-bottom: 30px;
+      }
+      
+      .user-details-content {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .main-content {
+        padding: 15px;
+      }
+      
+      .header {
+        padding: 10px 0;
+      }
+      
+      nav {
+        padding: 0 10px;
+      }
+      
+      .logo {
+        font-size: 18px;
+      }
+      
+      .user-info {
+        flex-wrap: wrap;
+        justify-content: flex-end;
+      }
+      
+      #user-email {
+        font-size: 12px;
+        padding: 4px 8px;
+        margin-right: 8px;
+      }
+      
+      #session-timer {
+        font-size: 12px;
+        padding: 4px 8px;
+        margin: 0 8px 0 0;
+      }
+      
+      .btn {
+        padding: 6px 12px;
+        font-size: 12px;
+      }
+      
+      .user-stats {
+        flex-wrap: wrap;
+      }
+      
+      .user-stat-item {
+        flex: 0 0 50%;
+        margin-bottom: 15px;
+      }
+      
+      .activity-item {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      
+      .activity-date {
+        margin-bottom: 5px;
+      }
+      
+      .user-actions {
+        flex-direction: column;
+      }
+      
+      .user-action-btn {
+        width: 100%;
+      }
+      
+      .user-avatar-section {
+        padding: 25px 15px;
+      }
+      
+      .user-avatar {
+        width: 120px;
+        height: 120px;
+      }
+      
+      .user-avatar-section h3 {
+        font-size: 20px;
+      }
+      
+      .user-role {
+        font-size: 14px;
+      }
+      
+      .user-details-section {
+        padding: 25px 15px;
+      }
+      
+      .user-details-header h2 {
+        font-size: 22px;
+      }
+      
+      .user-details-header p {
+        font-size: 14px;
+      }
+      
+      .user-details-item {
+        padding: 10px;
+      }
+      
+      .item-icon {
+        width: 32px;
+        height: 32px;
+        font-size: 14px;
+      }
+      
+      .user-details-value {
+        font-size: 14px;
+      }
+      
+      .badge {
+        font-size: 10px;
+        padding: 2px 6px;
+      }
+    }
+    
+    /* Small phone screens */
+    @media (max-width: 480px) {
+      .header {
+        padding: 8px 0;
+      }
+      
+      .logo {
+        font-size: 16px;
+      }
+      
+      .user-info {
+        margin-top: 8px;
+        justify-content: flex-end;
+        width: 100%;
+      }
+      
+      nav {
+        flex-wrap: wrap;
+      }
+      
+      #user-email, #session-timer {
+        margin-bottom: 8px;
+      }
+      
+      .user-avatar {
+        width: 100px;
+        height: 100px;
+      }
+      
+      .user-stat-value {
+        font-size: 16px;
+      }
+      
+      .user-stat-label {
+        font-size: 10px;
+      }
+      
+      .user-avatar-section h3 {
+        font-size: 18px;
+      }
+      
+      .user-role {
+        font-size: 12px;
+      }
+      
+      .user-details-header h2 {
+        font-size: 18px;
+      }
+      
+      .user-details-header p {
+        font-size: 12px;
+      }
+    }
+    /* Header styles */
+    .header {
+      background-color: rgba(20, 20, 20, 0.95);
+      padding: 15px 0;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+      position: sticky;
+      top: 0;
       z-index: 100;
-    }
-
-    .top-left {
-      top: 20px;
-      left: 20px;
-    }
-
-    .top-right {
-      top: 20px;
-      right: 20px;
-    }
-
-    .right-side {
-      top: 50%;
-      right: 20px;
-      transform: translateY(-50%);
-      flex-direction: column;
-    }
-
-    .btn {
-      background: rgba(255, 255, 255, 0.1);
-      border: 2px solid rgba(255, 255, 255, 0.2);
-      color: white;
-      padding: 12px 20px;
-      text-align: center;
-      text-decoration: none;
-      font-size: 16px;
-      border-radius: 50px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      position: relative;
-      overflow: hidden;
-      font-family: 'Poppins', sans-serif;
-      font-weight: 400;
       backdrop-filter: blur(10px);
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      display: inline-block;
-      margin: 5px;
+      -webkit-backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     }
-
-    .btn:hover {
-      background: rgba(255, 255, 255, 0.2);
-      border-color: rgba(255, 255, 255, 0.4);
-      transform: translateY(-2px);
-      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
     }
-
-    .btn:active {
-      transform: translateY(1px);
+    
+    .logo {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 700;
+      font-size: 22px;
+      color: #ffffff;
+      letter-spacing: 1px;
+      display: flex;
+      align-items: center;
     }
-
-    .btn i {
-      margin-right: 8px;
+    
+    .logo i {
+      margin-right: 10px;
+      color: #5C6BC0;
+    }
+    
+    .user-info {
+      display: flex;
+      align-items: center;
+    }
+    
+    #user-email {
+      margin-right: 15px;
+      font-family: 'Poppins', sans-serif;
+      color: #e0e0e0;
+      background-color: rgba(255, 255, 255, 0.05);
+      padding: 6px 12px;
+      border-radius: 20px;
       font-size: 14px;
     }
-
-    .hero-content {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      text-align: center;
-      z-index: 50;
+    
+    #session-timer {
+      margin: 0 15px;
+      padding: 6px 12px;
+      background-color: #2d2d2d;
+      border-radius: 20px;
+      font-size: 14px;
+      transition: all 0.3s ease;
     }
-
-    .welcome-text {
-      font-family: 'Montserrat', sans-serif;
-      font-size: 4rem;
-      font-weight: 700;
-      margin-bottom: 20px;
-      letter-spacing: 3px;
-      opacity: 0;
-      transform: translateY(30px);
-      animation: fadeInUp 1s ease forwards 0.3s;
+    
+    .btn {
+      padding: 8px 16px;
+      background-color: #f44336;
+      color: white;
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+      font-family: 'Poppins', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+    }
+    
+    .btn i {
+      margin-right: 6px;
+    }
+    
+    .btn:hover {
+      background-color: #d32f2f;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    
+    /* Main content container */
+    .main-content {
+      padding: 30px;
+      max-width: 1200px;
+      margin: 0 auto;
+      animation: fadeIn 0.5s ease;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* User profile section */
+    .user-profile-container {
+      display: flex;
+      background-color: rgba(30, 30, 30, 0.8);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+      margin-bottom: 30px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      transition: all 0.3s ease;
+    }
+    
+    .user-profile-container:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+    }
+    
+    /* User avatar section */
+    .user-avatar-section {
+      flex: 0 0 280px;
+      padding: 40px 30px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background-color: rgba(36, 36, 36, 0.8);
+      border-right: 1px solid #333;
       position: relative;
-      color: #ffffff;
-      text-shadow: 
-        0 0 5px rgba(255, 255, 255, 0.5),
-        0 0 10px rgba(255, 255, 255, 0.3),
-        0 0 15px rgba(255, 255, 255, 0.2),
-        0 0 20px rgba(220, 20, 60, 0.4);
-      background: linear-gradient(
-        90deg,
-        transparent 0%,
-        transparent 25%,
-        rgba(220, 20, 60, 0.8) 50%,
-        transparent 75%,
-        transparent 100%
-      );
-      background-size: 200% 100%;
-      background-clip: text;
-      -webkit-background-clip: text;
-      animation: fadeInUp 1s ease forwards 0.3s, glowSweep 3s ease-in-out infinite 1.5s;
+      overflow: hidden;
     }
-
-    @keyframes glowSweep {
-      0% {
-        background-position: -200% 0;
-        text-shadow: 
-          0 0 5px rgba(255, 255, 255, 0.5),
-          0 0 10px rgba(255, 255, 255, 0.3),
-          0 0 15px rgba(255, 255, 255, 0.2),
-          0 0 20px rgba(220, 20, 60, 0.2);
-      }
-      50% {
-        background-position: 200% 0;
-        text-shadow: 
-          0 0 10px rgba(255, 255, 255, 0.8),
-          0 0 20px rgba(220, 20, 60, 0.8),
-          0 0 30px rgba(220, 20, 60, 0.6),
-          0 0 40px rgba(220, 20, 60, 0.4),
-          0 0 50px rgba(220, 20, 60, 0.3);
-      }
-      100% {
-        background-position: 400% 0;
-        text-shadow: 
-          0 0 5px rgba(255, 255, 255, 0.5),
-          0 0 10px rgba(255, 255, 255, 0.3),
-          0 0 15px rgba(255, 255, 255, 0.2),
-          0 0 20px rgba(220, 20, 60, 0.2);
-      }
-    }
-
-    .welcome-text::before {
-      content: 'AKAXORZO';
+    
+    .user-avatar-section::before {
+      content: '';
       position: absolute;
       top: 0;
       left: 0;
       right: 0;
       bottom: 0;
-      background: linear-gradient(
-        90deg,
-        transparent 0%,
-        rgba(220, 20, 60, 0.9) 50%,
-        transparent 100%
-      );
-      background-size: 200% 100%;
-      background-clip: text;
-      -webkit-background-clip: text;
-      color: transparent;
-      animation: sweepLight 3s ease-in-out infinite 1.5s;
+      background: linear-gradient(135deg, rgba(92, 107, 192, 0.1), rgba(66, 66, 66, 0));
+      z-index: 0;
+    }
+    
+    .user-avatar {
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      overflow: hidden;
+      margin-bottom: 25px;
+      border: 4px solid #5C6BC0;
+      background-color: #333;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      z-index: 1;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    }
+    
+    .user-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s ease;
+    }
+    
+    .user-avatar:hover img {
+      transform: scale(1.05);
+    }
+    
+    .user-avatar .avatar-placeholder {
+      font-size: 80px;
+      color: #555;
+    }
+    
+    .avatar-status {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background-color: #4CAF50;
+      border: 3px solid #242424;
+      z-index: 2;
+    }
+    
+    .user-avatar-section h3 {
+      color: #ffffff;
+      margin-top: 15px;
+      margin-bottom: 8px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 24px;
+      font-weight: 700;
+      position: relative;
       z-index: 1;
     }
-
-    @keyframes sweepLight {
-      0% {
-        background-position: -200% 0;
-      }
-      100% {
-        background-position: 200% 0;
-      }
-    }
-
-    .tagline {
-      font-size: 1.2rem;
-      margin-bottom: 30px;
-      opacity: 0;
-      max-width: 600px;
-      margin-left: auto;
-      margin-right: auto;
-      transform: translateY(20px);
-      animation: fadeInUp 1s ease forwards 0.6s;
-      text-shadow: 1px 1px 10px rgba(0, 0, 0, 0.5);
-    }
-
-    .cta-button {
-      display: inline-block;
-      background: linear-gradient(45deg, #dc143c, #8b0000);
-      color: white;
-      padding: 15px 40px;
-      border-radius: 50px;
-      text-decoration: none;
-      font-weight: 600;
-      font-size: 18px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 15px rgba(220, 20, 60, 0.3);
-      opacity: 0;
-      transform: translateY(20px);
-      animation: fadeInUp 1s ease forwards 0.9s;
-    }
-
-    .cta-button:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 8px 25px rgba(220, 20, 60, 0.4);
-    }
-
-    @keyframes fadeInUp {
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .social-icons {
-      position: absolute;
-      bottom: 30px;
-      left: 50%;
-      transform: translateX(-50%);
+    
+    .user-role {
+      color: #5C6BC0;
+      font-size: 16px;
+      font-weight: 500;
+      position: relative;
+      z-index: 1;
+      background-color: rgba(92, 107, 192, 0.1);
+      padding: 5px 15px;
+      border-radius: 20px;
+      margin-top: 5px;
       display: flex;
-      gap: 20px;
+      align-items: center;
     }
-
-    .social-icon {
-      width: 50px;
-      height: 50px;
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 50%;
+    
+    .user-role i {
+      margin-right: 8px;
+    }
+    
+    .user-stats {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      margin-top: 25px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      position: relative;
+      z-index: 1;
+    }
+    
+    .user-stat-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 1;
+    }
+    
+    .user-stat-value {
+      font-size: 20px;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 5px;
+    }
+    
+    .user-stat-label {
+      font-size: 12px;
+      color: #9e9e9e;
+      text-align: center;
+    }
+    
+    /* User details section */
+    .user-details-section {
+      flex: 1;
+      padding: 40px;
+      position: relative;
+    }
+    
+    .user-details-header {
+      margin-bottom: 30px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding-bottom: 20px;
+    }
+    
+    .user-details-header h2 {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 28px;
+      color: #ffffff;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+    }
+    
+    .user-details-header h2 i {
+      margin-right: 12px;
+      color: #5C6BC0;
+    }
+    
+    .user-details-header p {
+      color: #9e9e9e;
+      font-size: 16px;
+    }
+    
+    .user-details-content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-gap: 30px;
+    }
+    
+    .user-details-item {
+      margin-bottom: 20px;
+      background-color: rgba(255, 255, 255, 0.03);
+      padding: 15px;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      display: flex;
+      align-items: center;
+    }
+    
+    .user-details-item:hover {
+      background-color: rgba(255, 255, 255, 0.05);
+      transform: translateY(-2px);
+    }
+    
+    .item-icon {
+      width: 40px;
+      height: 40px;
       display: flex;
       align-items: center;
       justify-content: center;
+      border-radius: 10px;
+      margin-right: 15px;
+      background-color: rgba(92, 107, 192, 0.15);
+      color: #5C6BC0;
       font-size: 18px;
-      color: white;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      backdrop-filter: blur(10px);
-      opacity: 0;
-      transform: translateY(20px);
     }
-
-    .social-icon:nth-child(1) {
-      animation: fadeInUp 0.5s ease forwards 1.2s;
+    
+    .item-content {
+      flex: 1;
     }
-
-    .social-icon:nth-child(2) {
-      animation: fadeInUp 0.5s ease forwards 1.4s;
+    
+    .user-details-label {
+      font-family: 'Poppins', sans-serif;
+      font-size: 13px;
+      font-weight: 400;
+      color: #9e9e9e;
+      margin-bottom: 5px;
     }
-
-    .social-icon:hover {
-      background: rgba(255, 255, 255, 0.2);
-      transform: scale(1.1);
-    }
-
-    /* Modal styling */
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.8);
-      backdrop-filter: blur(5px);
-      z-index: 1000;
-      opacity: 0;
-      transition: opacity 0.3s ease;
-    }
-
-    .modal.active {
-      opacity: 1;
-    }
-
-    .modal-content {
-      background: linear-gradient(135deg, #1a1a1a 0%, #2d0a0a 100%);
-      margin: 5% auto;
-      padding: 30px;
-      border-radius: 20px;
-      width: 90%;
-      max-width: 400px;
-      position: relative;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-      transform: translate(0, 0) scale(0.9);
-      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-
-    .modal.active .modal-content {
-      transform: translate(0, 0) scale(1);
-    }
-
-    .close-modal {
-      color: white;
-      float: right;
-      font-size: 28px;
-      font-weight: bold;
-      cursor: pointer;
-      position: absolute;
-      right: 20px;
-      top: 15px;
-      transition: color 0.3s;
-    }
-
-    .close-modal:hover {
-      opacity: 0.7;
-    }
-
-    .modal-title {
-      color: white;
-      margin-bottom: 25px;
-      text-align: center;
-      font-family: 'Montserrat', sans-serif;
-      font-size: 24px;
-    }
-
-    .modal form {
+    
+    .user-details-value {
+      font-family: 'Poppins', sans-serif;
+      font-size: 16px;
+      font-weight: 500;
+      color: #ffffff;
       display: flex;
-      flex-direction: column;
+      align-items: center;
+    }
+    
+    .status-indicator {
+      display: inline-flex;
+      align-items: center;
+      margin-right: 8px;
+    }
+    
+    .status-granted {
+      color: #4CAF50;
+    }
+    
+    .status-denied {
+      color: #F44336;
+    }
+    
+    .status-na {
+      color: #FFC107;
+    }
+    
+    .mod-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      background-color: rgba(255, 193, 7, 0.2);
+      border-radius: 50%;
+      margin-left: 10px;
+      animation: spin 4s linear infinite;
+    }
+    
+    .mod-badge.discord {
+      background-color: rgba(114, 137, 218, 0.2);
+      color: #7289DA;
+    }
+    
+    .mod-badge.youtube {
+      background-color: rgba(255, 193, 7, 0.2);
+      color: #FFC107;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    /* Attendance Tracking */
+    .attendance-tracking {
+      background-color: rgba(76, 175, 80, 0.1);
+      border: 1px solid rgba(76, 175, 80, 0.2);
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+    }
+    
+    .attendance-icon {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 10px;
+      margin-right: 15px;
+      background-color: rgba(76, 175, 80, 0.15);
+      color: #4CAF50;
+      font-size: 18px;
+    }
+    
+    .attendance-streak {
+      display: flex;
+      align-items: center;
+      margin-top: 10px;
+    }
+    
+    .streak-day {
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      margin-right: 5px;
+      background-color: #4CAF50;
+    }
+    
+    .streak-day.missed {
+      background-color: rgba(255, 255, 255, 0.3);
+    }
+    
+    /* Buttons */
+    .user-actions {
+      margin-top: 35px;
+      display: flex;
       gap: 15px;
     }
-
-    .modal input, .modal textarea {
-      padding: 12px;
+    
+    .user-action-btn {
+      padding: 12px 24px;
       border: none;
-      border-radius: 10px;
-      background: rgba(255, 255, 255, 0.1);
-      color: white;
+      border-radius: 25px;
       font-family: 'Poppins', sans-serif;
-      backdrop-filter: blur(10px);
-    }
-
-    .modal input::placeholder, .modal textarea::placeholder {
-      color: rgba(255, 255, 255, 0.7);
-    }
-
-    .modal input:focus, .modal textarea:focus {
-      outline: none;
-      border: 1px solid #dc143c;
-    }
-
-    .modal button {
-      background: linear-gradient(45deg, #dc143c, #8b0000);
-      color: white;
-      padding: 12px;
-      border: none;
-      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 500;
       cursor: pointer;
-      font-weight: 600;
+      display: flex;
+      align-items: center;
       transition: all 0.3s ease;
     }
-
-    .modal button:hover {
+    
+    .user-action-btn i {
+      margin-right: 8px;
+    }
+    
+    .btn-primary {
+      background-color: #5C6BC0;
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background-color: #3F51B5;
       transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(220, 20, 60, 0.4);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     }
-
-    .auth-switch {
-      text-align: center;
-      margin-top: 15px;
-      color: #aaa;
+    
+    .btn-secondary {
+      background-color: #4CAF50;
+      color: white;
     }
-
-    .auth-switch a {
-      color: #dc143c;
-      text-decoration: none;
-      cursor: pointer;
+    
+    .btn-secondary:hover {
+      background-color: #388E3C;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     }
-
-    .auth-switch a:hover {
-      text-decoration: underline;
+    
+    /* Badge and icon styles */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      background-color: rgba(76, 175, 80, 0.1);
+      color: #4CAF50;
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-size: 12px;
+      margin-left: 10px;
     }
-
-    /* Mobile navigation container */
-    .mobile-container {
-      display: none;
+    
+    .badge i {
+      margin-right: 4px;
     }
-
-    @media screen and (max-width: 768px) {
-      .desktop-nav {
-        display: none;
+    
+    .badge.youtube {
+      background-color: rgba(255, 0, 0, 0.1);
+      color: #ff0000;
+    }
+    
+    .badge.discord {
+      background-color: rgba(114, 137, 218, 0.1);
+      color: #7289DA;
+    }
+    
+    /* Activity graph */
+    .activity-graph {
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .activity-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    
+    .activity-header h3 {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 18px;
+      color: #ffffff;
+      margin: 0;
+    }
+    
+    .stream-activity-container {
+      display: flex;
+      flex-direction: column;
+      margin-top: 20px;
+      background-color: rgba(255, 255, 255, 0.03);
+      border-radius: 8px;
+      padding: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    
+    .activity-item {
+      display: flex;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    
+    .activity-item:last-child {
+      border-bottom: none;
+    }
+    
+    .activity-date {
+      font-size: 14px;
+      color: #9e9e9e;
+      flex: 0 0 120px;
+    }
+    
+    .activity-type {
+      font-size: 14px;
+      color: #ffffff;
+      flex: 1;
+      display: flex;
+      align-items: center;
+    }
+    
+    .activity-type i {
+      margin-right: 8px;
+      color: #5C6BC0;
+    }
+    
+    /* GIF display section */
+    .gif-container {
+      width: 100%;
+      margin-top: 20px;
+      overflow: hidden;
+      border-radius: 8px;
+      position: relative;
+    }
+    
+    .gif-container img {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 8px;
+    }
+    
+    /* Responsive design */
+    @media (max-width: 992px) {
+      .user-profile-container {
+        flex-direction: column;
       }
       
-      .mobile-container {
-        display: block;
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        background-color: rgba(0, 0, 0, 0.7);
-        z-index: 500;
-        padding: 10px 0;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+      .user-avatar-section {
+        flex: 0 0 auto;
+        border-right: none;
+        border-bottom: 1px solid #333;
+        padding-bottom: 30px;
       }
       
-      .btn {
-        padding: 8px 15px;
-        font-size: 0.9rem;
+      .user-details-content {
+        grid-template-columns: 1fr;
       }
-      
-      .welcome-text {
-        font-size: 2.5rem;
-      }
-      
-      .tagline {
-        font-size: 1rem;
-        padding: 0 20px;
-      }
-      
-      .cta-button {
-        padding: 12px 25px;
-        font-size: 16px;
-      }
-      
-      /* Navigation adjustments */
-      .top-left, .top-right {
-        position: static;
-        width: 100%;
-        display: flex;
-        flex-direction: row;
-        justify-content: center;
+    }
+    
+    @media (max-width: 768px) {
+      .user-stats {
         flex-wrap: wrap;
-        gap: 8px;
-        padding: 5px 10px;
       }
       
-      .top-left {
+      .user-stat-item {
+        flex: 0 0 50%;
+        margin-bottom: 15px;
+      }
+      
+      .activity-item {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      
+      .activity-date {
         margin-bottom: 5px;
       }
       
-      .right-side {
-        position: fixed;
-        bottom: 20px;
-        top: auto;
-        right: 0;
-        left: 0;
-        flex-direction: row;
-        justify-content: center;
-        gap: 10px;
-        padding: 10px;
-        z-index: 200;
-        transform: none;
+      .user-actions {
+        flex-direction: column;
       }
       
-      /* Hero content adjustments */
-      .hero-content {
-        width: 90%;
-        padding-top: 120px;
-        top: 50%;
-        transform: translate(-50%, -50%);
-      }
-      
-      /* Social icons adjustment */
-      .social-icons {
-        position: fixed;
-        bottom: 80px;
-        left: 0;
-        right: 0;
-        transform: none;
-        justify-content: center;
-        gap: 20px;
-        z-index: 150;
-      }
-      
-      /* Modal adjustments */
-      .modal-content {
-        width: 90%;
-        padding: 20px;
-      }
-    }
-
-    /* Small phone adjustments */
-    @media screen and (max-width: 480px) {
-      .welcome-text {
-        font-size: 2rem;
-      }
-      
-      .btn {
-        padding: 6px 12px;
-        font-size: 0.8rem;
-        margin: 2px;
-      }
-      
-      .right-side {
-        bottom: 15px;
-        gap: 8px;
-      }
-      
-      .social-icons {
-        bottom: 75px;
-      }
-      
-      .hero-content {
-        padding-top: 100px;
-      }
-      
-      .mobile-container {
-        padding: 8px 0;
-      }
-      
-      .top-left, .top-right {
-        gap: 6px;
-        padding: 3px 8px;
+      .user-action-btn {
+        width: 100%;
       }
     }
   </style>
 </head>
 <body>
-  <!-- Desktop navigation buttons -->
-  <div class="top-left desktop-nav">
-    <button class="btn" id="discord-btn"><i class="fab fa-discord"></i> Discord</button>
-    <button class="btn" id="youtube-btn"><i class="fab fa-youtube"></i> YouTube</button>
-  </div>
-  
-  <div class="top-right desktop-nav">
-    <button class="btn" id="events-btn"><i class="far fa-calendar-alt"></i> Events</button>
-    <button class="btn" id="login-btn"><i class="fas fa-sign-in-alt"></i> Login</button>
-    <button class="btn" id="signup-btn"><i class="fas fa-user-plus"></i> Sign Up</button>
-    <button class="btn" id="games-btn"><i class="fas fa-gamepad"></i> Games</button>
-  </div>
-  
-  <!-- Mobile navigation container -->
-  <div class="mobile-container">
-    <div class="top-left">
-      <button class="btn" id="discord-btn-mobile"><i class="fab fa-discord"></i> Discord</button>
-      <button class="btn" id="youtube-btn-mobile"><i class="fab fa-youtube"></i> YouTube</button>
-    </div>
-    
-    <div class="top-right">
-      <button class="btn" id="events-btn-mobile"><i class="far fa-calendar-alt"></i> Events</button>
-      <button class="btn" id="login-btn-mobile"><i class="fas fa-sign-in-alt"></i> Login</button>
-      <button class="btn" id="signup-btn-mobile"><i class="fas fa-user-plus"></i> Sign Up</button>
-      <button class="btn" id="games-btn-mobile"><i class="fas fa-gamepad"></i> Games</button>
-    </div>
-  </div>
-  
-  <div class="right-side">
-    <button class="btn" id="appeal-btn"><i class="fas fa-gavel"></i> Ban Appeal</button>
-    <button class="btn" id="friend-btn"><i class="fas fa-user-plus"></i> Friend Request</button>
-  </div>
-  
-  <div class="hero-content">
-    <h1 class="welcome-text">AKAXORZO</h1>
-    <p class="tagline">Join the adventure with exclusive streams, epic gameplay, and an amazing community!</p>
-    <a href="#" class="cta-button" id="subscribe-btn">Subscribe Now</a>
-  </div>
-  
-  <div class="social-icons">
-    <div class="social-icon"><i class="fab fa-twitch"></i></div>
-    <div class="social-icon"><i class="fab fa-twitter"></i></div>
-  </div>
-  
-  <!-- Login Modal -->
-  <div class="modal" id="login-modal">
-    <div class="modal-content">
-      <span class="close-modal">&times;</span>
-      <h2 class="modal-title">Login to Your Account</h2>
-      <form id="login-form">
-        <input type="email" name="email" placeholder="Email" required>
-        <input type="password" name="password" placeholder="Password" required>
-        <button type="submit">Log In</button>
-      </form>
-      <p class="auth-switch">Don't have an account? <a id="switch-to-signup">Sign up here</a></p>
-      <p style="text-align: center; margin-top: 10px; color: #aaa; font-size: 0.9rem;">Admin login available</p>
-    </div>
-  </div>
-  
-  <!-- Sign Up Modal -->
-  <div class="modal" id="signup-modal">
-    <div class="modal-content">
-      <span class="close-modal">&times;</span>
-      <h2 class="modal-title">Create Your Account</h2>
-      <form id="signup-form" name="signup" netlify>
-        <input type="text" name="name" placeholder="Full Name" required>
-        <input type="email" name="email" placeholder="Email" required>
-        <input type="password" name="password" placeholder="Password" required>
-        <input type="password" name="confirm-password" placeholder="Confirm Password" required>
-        <button type="submit">Sign Up</button>
-      </form>
-      <p class="auth-switch">Already have an account? <a id="switch-to-login">Login here</a></p>
-    </div>
-  </div>
-  
-  <!-- Friend Request Modal -->
-  <div class="modal" id="friend-modal">
-    <div class="modal-content">
-      <span class="close-modal">&times;</span>
-      <h2 class="modal-title">Send Friend Request</h2>
-      <form id="friend-form">
-        <input type="text" name="username" placeholder="Your Username" required>
-        <input type="text" name="email" placeholder="Your Email" required>
-        <textarea name="message" placeholder="Message (Optional)" rows="4"></textarea>
-        <button type="submit">Send Request</button>
-      </form>
-    </div>
-  </div>
-  
-  <!-- Ban Appeal Modal -->
-  <div class="modal" id="appeal-modal">
-    <div class="modal-content">
-      <span class="close-modal">&times;</span>
-      <h2 class="modal-title">Submit Ban Appeal</h2>
-      <form id="appeal-form">
-        <input type="text" name="username" placeholder="Your Username" required>
-        <input type="text" name="discord" placeholder="Discord ID" required>
-        <textarea name="reason" placeholder="Reason for appeal..." rows="4" required></textarea>
-        <button type="submit">Submit Appeal</button>
-      </form>
-    </div>
-  </div>
-  
-  <!-- Events Modal -->
-  <div class="modal" id="events-modal">
-    <div class="modal-content">
-      <span class="close-modal">&times;</span>
-      <h2 class="modal-title">Upcoming Events</h2>
-      <div style="color: white;">
-        <div style="margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1);">
-          <h3 style="color: #9c27b0;">Currently No Upcoming Events</h3>
+  <header class="header">
+    <nav>
+      <div class="logo">
+        <i class="fas fa-tv"></i>
+        AKAXORZO DASHBOARD
+      </div>
+      <div class="user-info">
+        <span id="user-email"><i class="fas fa-user-circle"></i> akax@gmail.com</span>
+        <span id="session-timer">
+          <i class="fas fa-clock"></i> 5:00
+        </span>
+        <button id="logout-btn" class="btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+      </div>
+    </nav>
+  </header>
+
+  <div class="main-content">
+    <div class="user-profile-container">
+      <!-- User Avatar Section -->
+      <div class="user-avatar-section">
+        <div class="user-avatar">
+          <img src="Images/Akax.png" alt="User Profile" />
+          <div class="avatar-status"></div>
+        </div>
+        <h3>Akaxorzo</h3>
+        <div class="user-role">
+          <i class="fas fa-crown"></i> Owner / Creator
+        </div>
+        
+        <div class="user-stats">
+          <div class="user-stat-item">
+            <div class="user-stat-value">9.1K</div>
+            <div class="user-stat-label">Subscribers</div>
+          </div>
+          <div class="user-stat-item">
+            <div class="user-stat-value">1.1k</div>
+            <div class="user-stat-label">Videos</div>
+          </div>
+          <div class="user-stat-item">
+            <div class="user-stat-value">828</div>
+            <div class="user-stat-label">Discord Members</div>
+          </div>
+        </div>
+        
+        <div class="gif-container" style="margin-top: 25px;">
+          <img src="Images/Welcome.png" alt="Welcome GIF" />
         </div>
       </div>
+      
+      <!-- User Details Section -->
+      <div class="user-details-section">
+        <div class="user-details-header">
+          <h2><i class="fas fa-id-card"></i> Akaxorzo Family ID</h2>
+          <p>User information and moderation status</p>
+        </div>
+        
+        <div class="user-details-content">
+          <!-- First column -->
+          <div>
+            <div class="user-details-item">
+              <div class="item-icon">
+                <i class="fas fa-user"></i>
+              </div>
+              <div class="item-content">
+                <div class="user-details-label">Username</div>
+                <div class="user-details-value">
+                  <span class="status-indicator">
+                    <i class="fas fa-check-circle status-granted"></i>
+                  </span>
+                  Akax26
+                  <span class="badge"><i class="fas fa-shield-alt"></i> Verified</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="user-details-item">
+              <div class="item-icon">
+                <i class="fab fa-youtube"></i>
+              </div>
+              <div class="item-content">
+                <div class="user-details-label">YouTube Username</div>
+                <div class="user-details-value">
+                  <span class="status-indicator">
+                    <i class="fas fa-check-circle status-granted"></i>
+                  </span>
+                  Akaxorzo
+                  <span class="badge youtube"><i class="fab fa-youtube"></i> Creator</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="user-details-item">
+              <div class="item-icon">
+                <i class="fab fa-discord"></i>
+              </div>
+              <div class="item-content">
+                <div class="user-details-label">Discord Username</div>
+                <div class="user-details-value">
+                  <span class="status-indicator">
+                    <i class="fas fa-check-circle status-granted"></i>
+                  </span>
+                  Akaxorzo
+                  <span class="badge discord"><i class="fab fa-discord"></i> Member</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="user-details-item">
+              <div class="item-icon">
+                <i class="fas fa-crown"></i>
+              </div>
+              <div class="item-content">
+                <div class="user-details-label">YouTube Owner</div>
+                <div class="user-details-value">
+                  <span class="status-indicator">
+                    <i class="fas fa-check-circle status-granted"></i>
+                  </span>
+                  True
+                  <span class="mod-badge youtube">
+                    <i class="fas fa-shield-alt"></i>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Second column -->
+          <div>
+            <div class="user-details-item">
+              <div class="item-icon">
+                <i class="fas fa-crown"></i>
+              </div>
+              <div class="item-content">
+                <div class="user-details-label">Discord Owner</div>
+                <div class="user-details-value">
+                  <span class="status-indicator">
+                    <i class="fas fa-check-circle status-granted"></i>
+                  </span>
+                  True
+                  <span class="mod-badge discord">
+                    <i class="fas fa-shield-alt"></i>
+                  </span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="user-details-item">
+              <div class="item-icon">
+                <i class="fas fa-birthday-cake"></i>
+              </div>
+              <div class="item-content">
+                <div class="user-details-label">Birthday</div>
+                <div class="user-details-value">
+                  <span class="status-indicator">
+                    <i class="fas fa-check-circle status-granted"></i>
+                  </span>
+                  March 18
+                </div>
+              </div>
+            </div>
+            
+            <!-- New Attendance Tracking -->
+            <div class="user-details-item">
+              <div class="item-icon">
+                <i class="fas fa-calendar-check"></i>
+              </div>
+              <div class="item-content">
+                <div class="user-details-label">Stream Attendance</div>
+                <div class="user-details-value">
+                  <span class="status-indicator">
+                    <i class="fas fa-fire status-granted"></i>
+                  </span>
+                  1 Day Streak
+                </div>
+                <div class="attendance-streak">
+                  <div class="streak-day"></div>
+                  <div class="streak-day"></div>
+                  <div class="streak-day"></div>
+                  <div class="streak-day"></div>
+                  <div class="streak-day"></div>
+                  <div class="streak-day"></div>
+                  <div class="streak-day"></div>
+                  <div class="streak-day missed"></div>
+                  <div class="streak-day"></div>
+                  <div class="streak-day"></div>
+                  <div class="streak-day"></div>
+                  <div class="streak-day"></div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="user-details-item">
+              <div class="item-icon">
+                <i class="fas fa-clock"></i>
+              </div>
+              <div class="item-content">
+                <div class="user-details-label">Last Stream Attended</div>
+                <div class="user-details-value">
+                  <span class="status-indicator">
+                    <i class="fas fa-check-circle status-granted"></i>
+                  </span>
+                  May 17, 2025
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Stream Activity Tracking -->
+        <div class="stream-activity-container">
+          <div class="activity-header">
+            <h3><i class="fas fa-history"></i> Recent Stream Activity</h3>
+          </div>
+          
+          <div class="activity-item">
+            <div class="activity-date">May 17, 2025</div>
+            <div class="activity-type">
+              <i class="fas fa-gamepad"></i> Game Stream: Roblox MM2 Live
+              
+            </div>
+          </div>
+          
+          <!-- <div class="activity-item">
+            <div class="activity-date">May 14, 2025</div>
+            <div class="activity-type">
+              <i class="fas fa-microphone"></i> Podcast: Gaming Industry News
+              <span class="badge"><i class="fas fa-heart"></i> Donated</span>
+              <span class="badge"><i class="fas fa-comments"></i> Active Chat</span>
+            </div>
+          </div>
+          
+          <div class="activity-item">
+            <div class="activity-date">May 12, 2025</div>
+            <div class="activity-type">
+              <i class="fas fa-gamepad"></i> Game Stream: Fortnite Tournament
+              <span class="badge"><i class="fas fa-trophy"></i> Won Giveaway</span>
+            </div>
+          </div>
+          
+          <div class="activity-item">
+            <div class="activity-date">May 10, 2025</div>
+            <div class="activity-type">
+              <i class="fas fa-users"></i> Community Day: Q&A Session
+              <span class="badge"><i class="fas fa-star"></i> Moderator</span>
+            </div>
+          </div> /*
+          
+          <div class="gif-container" style="margin-top: 20px;">
+            <img src="/api/placeholder/600/150" alt="Activity Statistics" />
+          </div>
+        </div> -->
+        
+        <!-- Action buttons -->
+        <div class="user-actions">
+          <button class="user-action-btn btn-primary" onclick="window.location.href='mod.html'">
+            <i class="fas fa-user-shield"></i> Apply for Mod
+          </button>
+          <button class="user-action-btn btn-secondary">
+            <i class="fas fa-edit"></i> Update User Data
+          </button>
+        </div>
+        
+        <!-- Animated GIF -->
+       
+      </div>
     </div>
-  </div>
-
-  <script>
-    // Modal functionality
-    const modals = {
-      'login-btn': 'login-modal',
-      'login-btn-mobile': 'login-modal',
-      'signup-btn': 'signup-modal',
-      'signup-btn-mobile': 'signup-modal',
-      'friend-btn': 'friend-modal',
-      'appeal-btn': 'appeal-modal',
-      'events-btn': 'events-modal',
-      'events-btn-mobile': 'events-modal'
-    };
-
-    const links = {
-      'discord-btn': 'https://discord.gg/your-server',
-      'discord-btn-mobile': 'https://discord.gg/your-server',
-      'youtube-btn': 'https://youtube.com/your-channel',
-      'youtube-btn-mobile': 'https://youtube.com/your-channel',
-      'games-btn': '/games',
-      'games-btn-mobile': '/games',
-      'subscribe-btn': 'https://youtube.com/your-channel'
-    };
-
-    // Open modals
-    Object.keys(modals).forEach(btnId => {
-      const btn = document.getElementById(btnId);
-      if (btn) {
-        btn.addEventListener('click', () => {
-          document.getElementById(modals[btnId]).style.display = 'block';
+    
+    <!-- Additional JavaScript for attendance tracking -->
+    <script>
+      // Sample data for demonstration purposes
+      const attendanceData = {
+        lastAttended: "May 17, 2025",
+        streak: 1,
+        streakDays: [true],
+        recentActivity: [
+          { date: "May 17, 2025", type: "EVENT", details: "MM2 BOYS VS GIRLS", badges: [] },
+        ]
+      };
+      
+      // Update streak days based on data
+      function updateStreakDisplay() {
+        const streakContainer = document.querySelector('.attendance-streak');
+        if (!streakContainer) return;
+        
+        streakContainer.innerHTML = '';
+        
+        attendanceData.streakDays.forEach(day => {
+          const dayElement = document.createElement('div');
+          dayElement.className = day ? 'streak-day' : 'streak-day missed';
+          streakContainer.appendChild(dayElement);
         });
       }
-    });
-
-    // Handle external links
-    Object.keys(links).forEach(btnId => {
-      const btn = document.getElementById(btnId);
-      if (btn && !modals[btnId]) {
-        btn.addEventListener('click', () => {
-          if (links[btnId].startsWith('http')) {
-            window.open(links[btnId], '_blank');
-          } else {
-            console.log('Navigate to:', links[btnId]);
-          }
-        });
-      }
-    });
-
-    // Close modals
-    document.querySelectorAll('.close-modal').forEach(closeBtn => {
-      closeBtn.addEventListener('click', (e) => {
-        e.target.closest('.modal').style.display = 'none';
+      
+      // Call this when the page loads
+      document.addEventListener('DOMContentLoaded', function() {
+        updateStreakDisplay();
       });
-    });
-
-    // Close modal when clicking outside
-    window.addEventListener('click', (e) => {
-      if (e.target.classList.contains('modal')) {
-        e.target.style.display = 'none';
-      }
-    });
-
-    // Switch between login and signup
-    document.getElementById('switch-to-signup').addEventListener('click', () => {
-      document.getElementById('login-modal').style.display = 'none';
-      document.getElementById('signup-modal').style.display = 'block';
-    });
-
-    document.getElementById('switch-to-login').addEventListener('click', () => {
-      document.getElementById('signup-modal').style.display = 'none';
-      document.getElementById('login-modal').style.display = 'block';
-    });
-
-    // Form submissions
-    document.getElementById('signup-form').addEventListener('submit', (e) => {
-      const password = e.target.password.value;
-      const confirmPassword = e.target['confirm-password'].value;
+    </script>
+  </div>
+  <script src="securepages.js"></script>
+    <script>
+  // Force initial scaling for mobile
+  document.addEventListener('DOMContentLoaded', function() {
+    // Handle mobile nav view
+    if (window.innerWidth <= 480) {
+      // Adjust layout for very small screens
+      const userInfo = document.querySelector('.user-info');
+      const nav = document.querySelector('nav');
       
-      if (password !== confirmPassword) {
-        e.preventDefault();
-        alert('Passwords do not match!');
-        return;
+      if (userInfo && nav) {
+        nav.style.flexDirection = 'column';
+        nav.style.alignItems = 'flex-start';
+        userInfo.style.marginTop = '10px';
+        userInfo.style.justifyContent = 'space-between';
+        userInfo.style.width = '100%';
       }
-      
-      console.log('Signup form submitted');
-    });
-
-    console.log("All scripts loaded");
-  </script>
+    }
+    
+    // Prevent zoom on inputs for iOS devices
+    document.addEventListener('touchstart', function(event) {
+      if (event.target.tagName === 'INPUT' || event.target.tagName === 'SELECT' || event.target.tagName === 'TEXTAREA') {
+        event.target.style.fontSize = '16px';
+      }
+    }, false);
+  });
+</script>
 </body>
 </html>
