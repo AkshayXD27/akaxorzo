@@ -10,7 +10,513 @@
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Poppins:wght@300;400;700&display=swap" rel="stylesheet">
   <!-- Font Awesome for icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-  <link rel="stylesheet" href="style.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #0a0a0a 0%, #1a0000 25%, #000000 50%, #2d0000 75%, #0f0f0f 100%);
+      min-height: 100vh;
+      color: white;
+      overflow-x: hidden;
+    }
+
+    .top-left, .top-right, .right-side {
+      position: absolute;
+      display: flex;
+      gap: 15px;
+      z-index: 100;
+    }
+
+    .top-left {
+      top: 20px;
+      left: 20px;
+    }
+
+    .top-right {
+      top: 20px;
+      right: 20px;
+    }
+
+    .right-side {
+      top: 50%;
+      right: 20px;
+      transform: translateY(-50%);
+      flex-direction: column;
+    }
+
+    .btn {
+      background: rgba(255, 255, 255, 0.1);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      color: white;
+      padding: 12px 20px;
+      text-align: center;
+      text-decoration: none;
+      font-size: 16px;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 400;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      display: inline-block;
+      margin: 5px;
+    }
+
+    .btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      border-color: rgba(255, 255, 255, 0.4);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn:active {
+      transform: translateY(1px);
+    }
+
+    .btn i {
+      margin-right: 8px;
+      font-size: 14px;
+    }
+
+    .hero-content {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      z-index: 50;
+    }
+
+    .welcome-text {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 4rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+      letter-spacing: 3px;
+      opacity: 0;
+      transform: translateY(30px);
+      animation: fadeInUp 1s ease forwards 0.3s;
+      position: relative;
+      color: #ffffff;
+      text-shadow: 
+        0 0 5px rgba(255, 255, 255, 0.5),
+        0 0 10px rgba(255, 255, 255, 0.3),
+        0 0 15px rgba(255, 255, 255, 0.2),
+        0 0 20px rgba(220, 20, 60, 0.4);
+      background: linear-gradient(
+        90deg,
+        transparent 0%,
+        transparent 25%,
+        rgba(220, 20, 60, 0.8) 50%,
+        transparent 75%,
+        transparent 100%
+      );
+      background-size: 200% 100%;
+      background-clip: text;
+      -webkit-background-clip: text;
+      animation: fadeInUp 1s ease forwards 0.3s, glowSweep 3s ease-in-out infinite 1.5s;
+    }
+
+    @keyframes glowSweep {
+      0% {
+        background-position: -200% 0;
+        text-shadow: 
+          0 0 5px rgba(255, 255, 255, 0.5),
+          0 0 10px rgba(255, 255, 255, 0.3),
+          0 0 15px rgba(255, 255, 255, 0.2),
+          0 0 20px rgba(220, 20, 60, 0.2);
+      }
+      50% {
+        background-position: 200% 0;
+        text-shadow: 
+          0 0 10px rgba(255, 255, 255, 0.8),
+          0 0 20px rgba(220, 20, 60, 0.8),
+          0 0 30px rgba(220, 20, 60, 0.6),
+          0 0 40px rgba(220, 20, 60, 0.4),
+          0 0 50px rgba(220, 20, 60, 0.3);
+      }
+      100% {
+        background-position: 400% 0;
+        text-shadow: 
+          0 0 5px rgba(255, 255, 255, 0.5),
+          0 0 10px rgba(255, 255, 255, 0.3),
+          0 0 15px rgba(255, 255, 255, 0.2),
+          0 0 20px rgba(220, 20, 60, 0.2);
+      }
+    }
+
+    .welcome-text::before {
+      content: 'AKAXORZO';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(220, 20, 60, 0.9) 50%,
+        transparent 100%
+      );
+      background-size: 200% 100%;
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+      animation: sweepLight 3s ease-in-out infinite 1.5s;
+      z-index: 1;
+    }
+
+    @keyframes sweepLight {
+      0% {
+        background-position: -200% 0;
+      }
+      100% {
+        background-position: 200% 0;
+      }
+    }
+
+    .tagline {
+      font-size: 1.2rem;
+      margin-bottom: 30px;
+      opacity: 0;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+      transform: translateY(20px);
+      animation: fadeInUp 1s ease forwards 0.6s;
+      text-shadow: 1px 1px 10px rgba(0, 0, 0, 0.5);
+    }
+
+    .cta-button {
+      display: inline-block;
+      background: linear-gradient(45deg, #dc143c, #8b0000);
+      color: white;
+      padding: 15px 40px;
+      border-radius: 50px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 18px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(220, 20, 60, 0.3);
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeInUp 1s ease forwards 0.9s;
+    }
+
+    .cta-button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(220, 20, 60, 0.4);
+    }
+
+    @keyframes fadeInUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .social-icons {
+      position: absolute;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 20px;
+    }
+
+    .social-icon {
+      width: 50px;
+      height: 50px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      color: white;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    .social-icon:nth-child(1) {
+      animation: fadeInUp 0.5s ease forwards 1.2s;
+    }
+
+    .social-icon:nth-child(2) {
+      animation: fadeInUp 0.5s ease forwards 1.4s;
+    }
+
+    .social-icon:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: scale(1.1);
+    }
+
+    /* Modal styling */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(5px);
+      z-index: 1000;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .modal.active {
+      opacity: 1;
+    }
+
+    .modal-content {
+      background: linear-gradient(135deg, #1a1a1a 0%, #2d0a0a 100%);
+      margin: 5% auto;
+      padding: 30px;
+      border-radius: 20px;
+      width: 90%;
+      max-width: 400px;
+      position: relative;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+      transform: translate(0, 0) scale(0.9);
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .modal.active .modal-content {
+      transform: translate(0, 0) scale(1);
+    }
+
+    .close-modal {
+      color: white;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+      position: absolute;
+      right: 20px;
+      top: 15px;
+      transition: color 0.3s;
+    }
+
+    .close-modal:hover {
+      opacity: 0.7;
+    }
+
+    .modal-title {
+      color: white;
+      margin-bottom: 25px;
+      text-align: center;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 24px;
+    }
+
+    .modal form {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .modal input, .modal textarea {
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      font-family: 'Poppins', sans-serif;
+      backdrop-filter: blur(10px);
+    }
+
+    .modal input::placeholder, .modal textarea::placeholder {
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .modal input:focus, .modal textarea:focus {
+      outline: none;
+      border: 1px solid #dc143c;
+    }
+
+    .modal button {
+      background: linear-gradient(45deg, #dc143c, #8b0000);
+      color: white;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    .modal button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(220, 20, 60, 0.4);
+    }
+
+    .auth-switch {
+      text-align: center;
+      margin-top: 15px;
+      color: #aaa;
+    }
+
+    .auth-switch a {
+      color: #dc143c;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .auth-switch a:hover {
+      text-decoration: underline;
+    }
+
+    /* Mobile navigation container */
+    .mobile-container {
+      display: none;
+    }
+
+    @media screen and (max-width: 768px) {
+      .desktop-nav {
+        display: none;
+      }
+      
+      .mobile-container {
+        display: block;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        background-color: rgba(0, 0, 0, 0.7);
+        z-index: 500;
+        padding: 10px 0;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+      }
+      
+      .btn {
+        padding: 8px 15px;
+        font-size: 0.9rem;
+      }
+      
+      .welcome-text {
+        font-size: 2.5rem;
+      }
+      
+      .tagline {
+        font-size: 1rem;
+        padding: 0 20px;
+      }
+      
+      .cta-button {
+        padding: 12px 25px;
+        font-size: 16px;
+      }
+      
+      /* Navigation adjustments */
+      .top-left, .top-right {
+        position: static;
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 8px;
+        padding: 5px 10px;
+      }
+      
+      .top-left {
+        margin-bottom: 5px;
+      }
+      
+      .right-side {
+        position: fixed;
+        bottom: 20px;
+        top: auto;
+        right: 0;
+        left: 0;
+        flex-direction: row;
+        justify-content: center;
+        gap: 10px;
+        padding: 10px;
+        z-index: 200;
+        transform: none;
+      }
+      
+      /* Hero content adjustments */
+      .hero-content {
+        width: 90%;
+        padding-top: 120px;
+        top: 50%;
+        transform: translate(-50%, -50%);
+      }
+      
+      /* Social icons adjustment */
+      .social-icons {
+        position: fixed;
+        bottom: 80px;
+        left: 0;
+        right: 0;
+        transform: none;
+        justify-content: center;
+        gap: 20px;
+        z-index: 150;
+      }
+      
+      /* Modal adjustments */
+      .modal-content {
+        width: 90%;
+        padding: 20px;
+      }
+    }
+
+    /* Small phone adjustments */
+    @media screen and (max-width: 480px) {
+      .welcome-text {
+        font-size: 2rem;
+      }
+      
+      .btn {
+        padding: 6px 12px;
+        font-size: 0.8rem;
+        margin: 2px;
+      }
+      
+      .right-side {
+        bottom: 15px;
+        gap: 8px;
+      }
+      
+      .social-icons {
+        bottom: 75px;
+      }
+      
+      .hero-content {
+        padding-top: 100px;
+      }
+      
+      .mobile-container {
+        padding: 8px 0;
+      }
+      
+      .top-left, .top-right {
+        gap: 6px;
+        padding: 3px 8px;
+      }
+    }
+  </style>
 </head>
 <body>
   <!-- Desktop navigation buttons -->
@@ -116,7 +622,6 @@
     </div>
   </div>
   
-  
   <!-- Events Modal -->
   <div class="modal" id="events-modal">
     <div class="modal-content">
@@ -130,15 +635,27 @@
     </div>
   </div>
 
-   <script>
+  <script>
     // Modal functionality
     const modals = {
-      
+      'login-btn': 'login-modal',
+      'login-btn-mobile': 'login-modal',
       'signup-btn': 'signup-modal',
       'signup-btn-mobile': 'signup-modal',
       'friend-btn': 'friend-modal',
+      'appeal-btn': 'appeal-modal',
       'events-btn': 'events-modal',
       'events-btn-mobile': 'events-modal'
+    };
+
+    const links = {
+      'discord-btn': 'https://discord.gg/your-server',
+      'discord-btn-mobile': 'https://discord.gg/your-server',
+      'youtube-btn': 'https://youtube.com/your-channel',
+      'youtube-btn-mobile': 'https://youtube.com/your-channel',
+      'games-btn': '/games',
+      'games-btn-mobile': '/games',
+      'subscribe-btn': 'https://youtube.com/your-channel'
     };
 
     // Open modals
@@ -147,6 +664,20 @@
       if (btn) {
         btn.addEventListener('click', () => {
           document.getElementById(modals[btnId]).style.display = 'block';
+        });
+      }
+    });
+
+    // Handle external links
+    Object.keys(links).forEach(btnId => {
+      const btn = document.getElementById(btnId);
+      if (btn && !modals[btnId]) {
+        btn.addEventListener('click', () => {
+          if (links[btnId].startsWith('http')) {
+            window.open(links[btnId], '_blank');
+          } else {
+            console.log('Navigate to:', links[btnId]);
+          }
         });
       }
     });
@@ -176,19 +707,6 @@
       document.getElementById('login-modal').style.display = 'block';
     });
 
-    Object.keys(links).forEach(btnId => {
-      const btn = document.getElementById(btnId);
-      if (btn && !modals[btnId]) {
-        btn.addEventListener('click', () => {
-          if (links[btnId].startsWith('http')) {
-            window.open(links[btnId], '_blank');
-          } else {
-            console.log('Navigate to:', links[btnId]);
-          }
-        });
-      }
-    });
-
     // Form submissions
     document.getElementById('signup-form').addEventListener('submit', (e) => {
       const password = e.target.password.value;
@@ -200,18 +718,10 @@
         return;
       }
       
-      // Netlify will handle the form submission
       console.log('Signup form submitted');
     });
 
     console.log("All scripts loaded");
   </script>
-  <!-- Firebase SDK (must be loaded before any scripts that use it) -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-  
-  <!-- Custom Scripts -->
-  <script src="register.js"></script>
-  <script src="script.js"></script>
 </body>
 </html>
