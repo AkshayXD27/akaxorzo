@@ -10,11 +10,268 @@
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Poppins:wght@300;400;700&display=swap" rel="stylesheet">
   <!-- Font Awesome for icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-  <!-- Custom CSS -->
-  <link rel="stylesheet" href="style.css">
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      color: white;
+      overflow-x: hidden;
+    }
+
+    .top-left, .top-right {
+      position: absolute;
+      top: 20px;
+      z-index: 100;
+    }
+
+    .top-left {
+      left: 20px;
+    }
+
+    .top-right {
+      right: 20px;
+    }
+
+    .right-side {
+      position: absolute;
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      z-index: 100;
+    }
+
+    .btn {
+      background: rgba(255, 255, 255, 0.1);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      color: white;
+      padding: 12px 20px;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 400;
+      backdrop-filter: blur(10px);
+      margin: 5px;
+    }
+
+    .btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      border-color: rgba(255, 255, 255, 0.4);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .hero-content {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      z-index: 50;
+    }
+
+    .welcome-text {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 4rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+      letter-spacing: 3px;
+    }
+
+    .tagline {
+      font-size: 1.2rem;
+      margin-bottom: 30px;
+      opacity: 0.9;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .cta-button {
+      display: inline-block;
+      background: linear-gradient(45deg, #9c27b0, #e91e63);
+      color: white;
+      padding: 15px 40px;
+      border-radius: 50px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(156, 39, 176, 0.3);
+    }
+
+    .cta-button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(156, 39, 176, 0.4);
+    }
+
+    .social-icons {
+      position: absolute;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 20px;
+    }
+
+    .social-icon {
+      width: 50px;
+      height: 50px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+    }
+
+    .social-icon:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: scale(1.1);
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(5px);
+    }
+
+    .modal-content {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      margin: 5% auto;
+      padding: 30px;
+      border-radius: 20px;
+      width: 90%;
+      max-width: 400px;
+      position: relative;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .close-modal {
+      color: white;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+      position: absolute;
+      right: 20px;
+      top: 15px;
+    }
+
+    .close-modal:hover {
+      opacity: 0.7;
+    }
+
+    .modal-title {
+      color: white;
+      margin-bottom: 25px;
+      text-align: center;
+      font-family: 'Montserrat', sans-serif;
+    }
+
+    .modal form {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .modal input, .modal textarea {
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      font-family: 'Poppins', sans-serif;
+      backdrop-filter: blur(10px);
+    }
+
+    .modal input::placeholder, .modal textarea::placeholder {
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .modal button[type="submit"] {
+      background: linear-gradient(45deg, #9c27b0, #e91e63);
+      color: white;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    .modal button[type="submit"]:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(156, 39, 176, 0.4);
+    }
+
+    .auth-switch {
+      text-align: center;
+      margin-top: 15px;
+      color: #aaa;
+    }
+
+    .auth-switch a {
+      color: #9c27b0;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .auth-switch a:hover {
+      text-decoration: underline;
+    }
+
+    /* Mobile Responsive */
+    .mobile-container {
+      display: none;
+    }
+
+    @media (max-width: 768px) {
+      .desktop-nav {
+        display: none;
+      }
+      
+      .mobile-container {
+        display: block;
+      }
+      
+      .welcome-text {
+        font-size: 2.5rem;
+      }
+      
+      .right-side {
+        right: 10px;
+        gap: 10px;
+      }
+      
+      .btn {
+        padding: 8px 15px;
+        font-size: 0.9rem;
+      }
+    }
+  </style>
 </head>
 <body>
-  <!-- Desktop navigation buttons - explicitly positioned for desktop view -->
+  <!-- Desktop navigation buttons -->
   <div class="top-left desktop-nav">
     <button class="btn" id="discord-btn"><i class="fab fa-discord"></i> Discord</button>
     <button class="btn" id="youtube-btn"><i class="fab fa-youtube"></i> YouTube</button>
@@ -23,6 +280,7 @@
   <div class="top-right desktop-nav">
     <button class="btn" id="events-btn"><i class="far fa-calendar-alt"></i> Events</button>
     <button class="btn" id="login-btn"><i class="fas fa-sign-in-alt"></i> Login</button>
+    <button class="btn" id="signup-btn"><i class="fas fa-user-plus"></i> Sign Up</button>
     <button class="btn" id="games-btn"><i class="fas fa-gamepad"></i> Games</button>
   </div>
   
@@ -36,6 +294,7 @@
     <div class="top-right">
       <button class="btn" id="events-btn-mobile"><i class="far fa-calendar-alt"></i> Events</button>
       <button class="btn" id="login-btn-mobile"><i class="fas fa-sign-in-alt"></i> Login</button>
+      <button class="btn" id="signup-btn-mobile"><i class="fas fa-user-plus"></i> Sign Up</button>
       <button class="btn" id="games-btn-mobile"><i class="fas fa-gamepad"></i> Games</button>
     </div>
   </div>
@@ -66,7 +325,24 @@
         <input type="password" name="password" placeholder="Password" required>
         <button type="submit">Log In</button>
       </form>
-      <p style="text-align: center; margin-top: 15px; color: #aaa;">This is for admins only</p>
+      <p class="auth-switch">Don't have an account? <a id="switch-to-signup">Sign up here</a></p>
+      <p style="text-align: center; margin-top: 10px; color: #aaa; font-size: 0.9rem;">Admin login available</p>
+    </div>
+  </div>
+  
+  <!-- Sign Up Modal -->
+  <div class="modal" id="signup-modal">
+    <div class="modal-content">
+      <span class="close-modal">&times;</span>
+      <h2 class="modal-title">Create Your Account</h2>
+      <form id="signup-form" name="signup" netlify>
+        <input type="text" name="name" placeholder="Full Name" required>
+        <input type="email" name="email" placeholder="Email" required>
+        <input type="password" name="password" placeholder="Password" required>
+        <input type="password" name="confirm-password" placeholder="Confirm Password" required>
+        <button type="submit">Sign Up</button>
+      </form>
+      <p class="auth-switch">Already have an account? <a id="switch-to-login">Login here</a></p>
     </div>
   </div>
   
@@ -98,6 +374,7 @@
     </div>
   </div>
   
+  
   <!-- Events Modal -->
   <div class="modal" id="events-modal">
     <div class="modal-content">
@@ -110,12 +387,83 @@
       </div>
     </div>
   </div>
-  
-  <!-- Connect mobile buttons to desktop actions -->
+
   <script>
-    // Mobile button handling will be done in the main script
+    // Modal functionality
+    const modals = {
+      
+      'signup-btn': 'signup-modal',
+      'signup-btn-mobile': 'signup-modal',
+      'friend-btn': 'friend-modal',
+      'events-btn': 'events-modal',
+      'events-btn-mobile': 'events-modal'
+    };
+
+    // Open modals
+    Object.keys(modals).forEach(btnId => {
+      const btn = document.getElementById(btnId);
+      if (btn) {
+        btn.addEventListener('click', () => {
+          document.getElementById(modals[btnId]).style.display = 'block';
+        });
+      }
+    });
+
+    // Close modals
+    document.querySelectorAll('.close-modal').forEach(closeBtn => {
+      closeBtn.addEventListener('click', (e) => {
+        e.target.closest('.modal').style.display = 'none';
+      });
+    });
+
+    // Close modal when clicking outside
+    window.addEventListener('click', (e) => {
+      if (e.target.classList.contains('modal')) {
+        e.target.style.display = 'none';
+      }
+    });
+
+    // Switch between login and signup
+    document.getElementById('switch-to-signup').addEventListener('click', () => {
+      document.getElementById('login-modal').style.display = 'none';
+      document.getElementById('signup-modal').style.display = 'block';
+    });
+
+    document.getElementById('switch-to-login').addEventListener('click', () => {
+      document.getElementById('signup-modal').style.display = 'none';
+      document.getElementById('login-modal').style.display = 'block';
+    });
+
+    Object.keys(links).forEach(btnId => {
+      const btn = document.getElementById(btnId);
+      if (btn && !modals[btnId]) {
+        btn.addEventListener('click', () => {
+          if (links[btnId].startsWith('http')) {
+            window.open(links[btnId], '_blank');
+          } else {
+            console.log('Navigate to:', links[btnId]);
+          }
+        });
+      }
+    });
+
+    // Form submissions
+    document.getElementById('signup-form').addEventListener('submit', (e) => {
+      const password = e.target.password.value;
+      const confirmPassword = e.target['confirm-password'].value;
+      
+      if (password !== confirmPassword) {
+        e.preventDefault();
+        alert('Passwords do not match!');
+        return;
+      }
+      
+      // Netlify will handle the form submission
+      console.log('Signup form submitted');
+    });
+
+    console.log("All scripts loaded");
   </script>
-  
   <!-- Firebase SDK (must be loaded before any scripts that use it) -->
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
@@ -123,10 +471,5 @@
   <!-- Custom Scripts -->
   <script src="register.js"></script>
   <script src="script.js"></script>
-  
-  <!-- Debug helper to confirm scripts are loaded -->
-  <script>
-    console.log("All scripts loaded");
-  </script>
 </body>
 </html>
