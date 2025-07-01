@@ -1,12 +1,19 @@
 //a
   const firebaseConfig = {
-    apiKey: "AIzaSyBwHdL5Pl6Zp7QpiaIvj8N34tip88K04Ms",
-    authDomain: "akaxorzo-dd5eb.firebaseapp.com",
-    projectId: "akaxorzo-dd5eb",
-    storageBucket: "akaxorzo-dd5eb.firebasestorage.app",
-    messagingSenderId: "633801465984",
-    appId: "1:633801465984:web:72e2d1ce6e17b2a6648665",
-    measurementId: "G-EVFCT5Q7NF"
+   apiKey: "AIzaSyCVyyI45GePPjfybjXyTpE58S-AHKrn3Cw",
+
+  authDomain: "akaxorzoxd.firebaseapp.com",
+
+  projectId: "akaxorzoxd",
+
+  storageBucket: "akaxorzoxd.firebasestorage.app",
+
+  messagingSenderId: "1053251026053",
+
+  appId: "1:1053251026053:web:301bf3778b20a23c0d7dec",
+
+  measurementId: "G-SX8XFPJP83"
+
   };
 
 let auth;
