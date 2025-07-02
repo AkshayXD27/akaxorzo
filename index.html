@@ -710,17 +710,16 @@
    document.getElementById('signup-form').addEventListener('submit', (e) => {
   const password = e.target.password.value;
   const confirmPassword = e.target['confirm-password'].value;
+document.getElementById('signup-form').addEventListener('submit', function(e) {
+  const password = this.password.value;
+  const confirmPassword = this['confirm-password'].value;
 
   if (password !== confirmPassword) {
-    e.preventDefault(); // Prevent only if passwords don't match
+    e.preventDefault(); // only block if mismatch
     alert('Passwords do not match!');
-    return;
   }
-
-  // ✅ Don't block Netlify submission
-  // Optionally show a message:
-  console.log('Signup form submitted');
 });
+
 
     console.log("All scripts loaded");
   </script>
