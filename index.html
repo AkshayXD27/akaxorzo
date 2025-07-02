@@ -641,87 +641,112 @@
   </div>
 
    <script>
-     const links = {
+    // External links
+const links = {
   'discord-btn': 'https://discord.com/invite/gjR4Mvmk',
   'discord-btn-mobile': 'https://discord.com/invite/gjR4Mvmk',
   'youtube-btn': 'https://youtube.com/@Akaxorzo',
-  'youtube-btn-mobile': 'https://youtube.com/@Akaxorzo',
+  'youtube-btn-mobile': 'https://youtube.com/@Akaxorzo'
 };
 
-    // Modal functionality
-    const modals = {
-      
-      'signup-btn': 'signup-modal',
-      'signup-btn-mobile': 'signup-modal',
-    };
+// Modal mapping
+const modals = {
+  'signup-btn': 'signup-modal',
+  'signup-btn-mobile': 'signup-modal',
+  'login-btn': 'login-modal',
+  'login-btn-mobile': 'login-modal',
+  'events-btn': 'events-modal',
+  'events-btn-mobile': 'events-modal',
+  'friend-btn': 'friend-modal',
+  'appeal-btn': 'appeal-modal'
+};
 
-    // Open modals
-    Object.keys(modals).forEach(btnId => {
-      const btn = document.getElementById(btnId);
-      if (btn) {
-        btn.addEventListener('click', () => {
-          document.getElementById(modals[btnId]).style.display = 'block';
-        });
-      }
-    });
-
-    // Close modals
-    document.querySelectorAll('.close-modal').forEach(closeBtn => {
-      closeBtn.addEventListener('click', (e) => {
-        e.target.closest('.modal').style.display = 'none';
+// Open modals
+Object.keys(modals).forEach(btnId => {
+  const btn = document.getElementById(btnId);
+  if (btn) {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.modal').forEach(modal => {
+        modal.style.display = 'none';
+        modal.classList.remove('active');
       });
-    });
-
-
-     
-
-    // Close modal when clicking outside
-    window.addEventListener('click', (e) => {
-      if (e.target.classList.contains('modal')) {
-        e.target.style.display = 'none';
+      const modal = document.getElementById(modals[btnId]);
+      if (modal) {
+        modal.style.display = 'block';
+        modal.classList.add('active');
       }
     });
-
-    // Switch between login and signup
-    document.getElementById('switch-to-signup').addEventListener('click', () => {
-      document.getElementById('login-modal').style.display = 'none';
-      document.getElementById('signup-modal').style.display = 'block';
-    });
-
-    document.getElementById('switch-to-login').addEventListener('click', () => {
-      document.getElementById('signup-modal').style.display = 'none';
-      document.getElementById('login-modal').style.display = 'block';
-    });
-
-    Object.keys(links).forEach(btnId => {
-      const btn = document.getElementById(btnId);
-      if (btn && !modals[btnId]) {
-        btn.addEventListener('click', () => {
-          if (links[btnId].startsWith('http')) {
-            window.open(links[btnId], '_blank');
-          } else {
-            console.log('Navigate to:', links[btnId]);
-          }
-        });
-      }
-    });
-
-    // Form submissions
-   document.getElementById('signup-form').addEventListener('submit', (e) => {
-  const password = e.target.password.value;
-  const confirmPassword = e.target['confirm-password'].value;
-document.getElementById('signup-form').addEventListener('submit', function(e) {
-  const password = this.password.value;
-  const confirmPassword = this['confirm-password'].value;
-
-  if (password !== confirmPassword) {
-    e.preventDefault(); // only block if mismatch
-    alert('Passwords do not match!');
   }
 });
 
+// Close modal buttons
+document.querySelectorAll('.close-modal').forEach(closeBtn => {
+  closeBtn.addEventListener('click', (e) => {
+    const modal = e.target.closest('.modal');
+    modal.style.display = 'none';
+    modal.classList.remove('active');
+  });
+});
 
-    console.log("All scripts loaded");
+// Close modals on outside click
+window.addEventListener('click', (e) => {
+  if (e.target.classList.contains('modal')) {
+    e.target.style.display = 'none';
+    e.target.classList.remove('active');
+  }
+});
+
+// Switch login ↔ signup
+const switchSignup = document.getElementById('switch-to-signup');
+if (switchSignup) {
+  switchSignup.addEventListener('click', () => {
+    const login = document.getElementById('login-modal');
+    const signup = document.getElementById('signup-modal');
+    login.style.display = 'none';
+    login.classList.remove('active');
+    signup.style.display = 'block';
+    signup.classList.add('active');
+  });
+}
+
+const switchLogin = document.getElementById('switch-to-login');
+if (switchLogin) {
+  switchLogin.addEventListener('click', () => {
+    const signup = document.getElementById('signup-modal');
+    const login = document.getElementById('login-modal');
+    signup.style.display = 'none';
+    signup.classList.remove('active');
+    login.style.display = 'block';
+    login.classList.add('active');
+  });
+}
+
+// Open links
+Object.keys(links).forEach(btnId => {
+  const btn = document.getElementById(btnId);
+  if (btn && !modals[btnId]) {
+    btn.addEventListener('click', () => {
+      window.open(links[btnId], '_blank');
+    });
+  }
+});
+
+// Signup form submit
+const signupForm = document.getElementById('signup-form');
+if (signupForm) {
+  signupForm.addEventListener('submit', function (e) {
+    const password = this.password.value;
+    const confirmPassword = this['confirm-password'].value;
+
+    if (password !== confirmPassword) {
+      e.preventDefault();
+      alert('Passwords do not match!');
+    }
+  });
+}
+
+console.log("script.js loaded");
+
   </script>
   <!-- Firebase SDK (must be loaded before any scripts that use it) -->
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
