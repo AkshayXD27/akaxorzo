@@ -583,13 +583,17 @@
     <div class="modal-content">
       <span class="close-modal">&times;</span>
       <h2 class="modal-title">Create Your Account</h2>
-      <form id="signup-form" name="signup" netlify>
-        <input type="text" name="name" placeholder="Full Name" required>
-        <input type="email" name="email" placeholder="Email" required>
-        <input type="password" name="password" placeholder="Password" required>
-        <input type="password" name="confirm-password" placeholder="Confirm Password" required>
-        <button type="submit">Sign Up</button>
-      </form>
+      <form id="signup-form" name="signup" method="POST" data-netlify="true">
+  <input type="hidden" name="form-name" value="signup">
+  
+  <input type="text" name="name" placeholder="Full Name" required>
+  <input type="email" name="email" placeholder="Email" required>
+  <input type="password" name="password" placeholder="Password" required>
+  <input type="password" name="confirm-password" placeholder="Confirm Password" required>
+  
+  <button type="submit">Sign Up</button>
+</form>
+
       <p class="auth-switch">Already have an account? <a id="switch-to-login">Login here</a></p>
     </div>
   </div>
