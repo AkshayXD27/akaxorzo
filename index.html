@@ -637,14 +637,18 @@
   </div>
 
    <script>
+     const links = {
+  'discord-btn': 'https://discord.com/invite/your-server',
+  'discord-btn-mobile': 'https://discord.com/invite/your-server',
+  'youtube-btn': 'https://youtube.com/@yourchannel',
+  'youtube-btn-mobile': 'https://youtube.com/@yourchannel',
+};
+
     // Modal functionality
     const modals = {
       
       'signup-btn': 'signup-modal',
       'signup-btn-mobile': 'signup-modal',
-      'friend-btn': 'friend-modal',
-      'events-btn': 'events-modal',
-      'events-btn-mobile': 'events-modal'
     };
 
     // Open modals
@@ -715,20 +719,7 @@
   <!-- Firebase SDK (must be loaded before any scripts that use it) -->
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-  <script>
-  const links = {
-    'discord-btn': 'https://discord.com/invite/your-server',
-    'discord-btn-mobile': 'https://discord.com/invite/your-server',
-    'youtube-btn': 'https://youtube.com/@yourchannel',
-    'youtube-btn-mobile': 'https://youtube.com/@yourchannel',
-    'games-btn': 'https://yourgamespage.com',
-    'games-btn-mobile': 'https://yourgamespage.com',
-    'login-btn': '#login-modal', // If you want this to open modal, it's already handled in `modals` so no need here
-    'login-btn-mobile': '#login-modal'
-    // Add more if needed
-  };
-</script>
-
+  
   <!-- Custom Scripts -->
   <script src="register.js"></script>
   <script src="script.js"></script>
