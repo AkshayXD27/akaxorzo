@@ -587,7 +587,7 @@
   <input type="hidden" name="form-name" value="signup">
   
   <input type="text" name="name" placeholder="Full Name" required>
-  <input type="email" name="email" placeholder="Email (If you dont have type yourname@gmail.com)" required>
+  <input type="email" name="email" placeholder="Email" required readonly>
   <input type="password" name="password" placeholder="Password" required>
   <input type="password" name="confirm-password" placeholder="Confirm Password" required>
   
@@ -729,6 +729,11 @@ Object.keys(links).forEach(btnId => {
       window.open(links[btnId], '_blank');
     });
   }
+});
+     
+document.getElementById('name').addEventListener('input', function () {
+  const name = this.value.trim().toLowerCase().replace(/\s+/g, '');
+  document.getElementById('email').value = name ? `${name}@gmail.com` : '';
 });
 
 // Signup form submit
