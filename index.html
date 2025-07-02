@@ -668,6 +668,9 @@
       });
     });
 
+
+     
+
     // Close modal when clicking outside
     window.addEventListener('click', (e) => {
       if (e.target.classList.contains('modal')) {
@@ -700,19 +703,20 @@
     });
 
     // Form submissions
-    document.getElementById('signup-form').addEventListener('submit', (e) => {
-      const password = e.target.password.value;
-      const confirmPassword = e.target['confirm-password'].value;
-      
-      if (password !== confirmPassword) {
-        e.preventDefault();
-        alert('Passwords do not match!');
-        return;
-      }
-      
-      // Netlify will handle the form submission
-      console.log('Signup form submitted');
-    });
+   document.getElementById('signup-form').addEventListener('submit', (e) => {
+  const password = e.target.password.value;
+  const confirmPassword = e.target['confirm-password'].value;
+
+  if (password !== confirmPassword) {
+    e.preventDefault(); // Prevent only if passwords don't match
+    alert('Passwords do not match!');
+    return;
+  }
+
+  // ✅ Don't block Netlify submission
+  // Optionally show a message:
+  console.log('Signup form submitted');
+});
 
     console.log("All scripts loaded");
   </script>
