@@ -3,30 +3,866 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  
   <title>Akaxorzo ID</title>
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="icon" href="aka.png" type="image/png">
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Poppins:wght@300;400;500;700&display=swap" rel="stylesheet">
-  <!-- Font Awesome for icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-  
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-  
   <!-- Custom CSS -->
-  <link rel="stylesheet" href="style.css">
-  
-  <!-- IMPROVED Page Protection Script with Auto Logout -->
+  <style>
+    :root {
+      --primary: #9c27b0;
+      --primary-dark: #7b1fa2;
+      --secondary: #3f51b5;
+      --secondary-dark: #303f9f;
+      --success: #4CAF50;
+      --error: #F44336;
+      --warning: #FFC107;
+      --dark-bg: #121212;
+      --darker-bg: #0a0a0a;
+      --card-bg: #1e1e1e;
+      --text-light: #f5f5f5;
+      --text-muted: #aaaaaa;
+      --border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: var(--darker-bg);
+      color: var(--text-light);
+      min-height: 100vh;
+      background-image: linear-gradient(to bottom, var(--darker-bg), var(--dark-bg), var(--darker-bg));
+      line-height: 1.6;
+    }
+
+    /* Header Styles */
+    .header {
+      background-color: rgba(20, 20, 20, 0.95);
+      padding: 1rem 0;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .header-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 700;
+      font-size: 1.5rem;
+      color: white;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+    }
+
+    .logo i {
+      color: var(--primary);
+      font-size: 1.75rem;
+    }
+
+    .logo-text {
+      background: linear-gradient(45deg, var(--primary), var(--secondary));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-shadow: 0 0 10px rgba(156, 39, 176, 0.3);
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .user-email {
+      background-color: rgba(255, 255, 255, 0.08);
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .session-timer {
+      background-color: var(--card-bg);
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.3s ease;
+    }
+
+    .session-timer.warning {
+      background-color: var(--error);
+      color: white;
+    }
+
+    .logout-btn {
+      background-color: var(--error);
+      color: white;
+      border: none;
+      padding: 0.5rem 1.25rem;
+      border-radius: 20px;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.3s ease;
+    }
+
+    .logout-btn:hover {
+      background-color: #d32f2f;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Main Content */
+    .main-content {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 20px;
+      animation: fadeIn 0.5s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Profile Container */
+    .profile-container {
+      display: flex;
+      background-color: var(--card-bg);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+      margin-bottom: 2rem;
+      border: 1px solid var(--border-color);
+      transition: all 0.3s ease;
+    }
+
+    .profile-container:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    /* Avatar Section */
+    .avatar-section {
+      flex: 0 0 300px;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: linear-gradient(135deg, rgba(92, 107, 192, 0.1), rgba(66, 66, 66, 0.2));
+      border-right: 1px solid var(--border-color);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .avatar-wrapper {
+      position: relative;
+      width: 180px;
+      height: 180px;
+      margin-bottom: 1.5rem;
+    }
+
+    .avatar {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 4px solid var(--primary);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      transition: transform 0.5s ease;
+    }
+
+    .avatar:hover {
+      transform: scale(1.05);
+    }
+
+    .avatar-status {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background-color: var(--success);
+      border: 3px solid var(--card-bg);
+      z-index: 2;
+    }
+
+    .user-name {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: white;
+      margin-bottom: 0.5rem;
+      text-align: center;
+    }
+
+    .user-role {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background-color: rgba(92, 107, 192, 0.15);
+      color: var(--primary);
+      padding: 0.5rem 1.25rem;
+      border-radius: 20px;
+      font-weight: 500;
+      margin-bottom: 1.5rem;
+    }
+
+    /* Stats */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      width: 100%;
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .stat-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .stat-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: white;
+      margin-bottom: 0.25rem;
+    }
+
+    .stat-label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      text-align: center;
+    }
+
+    /* Welcome GIF */
+    .welcome-gif {
+      width: 100%;
+      margin-top: 1.5rem;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .welcome-gif img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    /* Details Section */
+    .details-section {
+      flex: 1;
+      padding: 2rem;
+    }
+
+    .section-header {
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .section-title {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 1.5rem;
+      color: white;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .section-title i {
+      color: var(--primary);
+    }
+
+    .section-subtitle {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    /* Details Grid */
+    .details-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+    }
+
+    .detail-card {
+      background-color: rgba(255, 255, 255, 0.03);
+      border-radius: 8px;
+      padding: 1rem;
+      border: 1px solid var(--border-color);
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+    }
+
+    .detail-card:hover {
+      background-color: rgba(255, 255, 255, 0.05);
+      transform: translateY(-3px);
+    }
+
+    .detail-icon {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 10px;
+      margin-right: 1rem;
+      background-color: rgba(92, 107, 192, 0.15);
+      color: var(--primary);
+      font-size: 1.25rem;
+    }
+
+    .detail-content {
+      flex: 1;
+    }
+
+    .detail-label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 0.25rem;
+    }
+
+    .detail-value {
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .status-indicator {
+      color: var(--success);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 0.25rem 0.75rem;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      margin-left: 0.5rem;
+    }
+
+    .badge.verified {
+      background-color: rgba(76, 175, 80, 0.1);
+      color: var(--success);
+    }
+
+    .badge.creator {
+      background-color: rgba(255, 0, 0, 0.1);
+      color: #ff0000;
+    }
+
+    .badge.member {
+      background-color: rgba(114, 137, 218, 0.1);
+      color: #7289DA;
+    }
+
+    /* Mod Badge */
+    .mod-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      margin-left: 0.5rem;
+      animation: spin 4s linear infinite;
+    }
+
+    .mod-badge.youtube {
+      background-color: rgba(255, 193, 7, 0.2);
+      color: var(--warning);
+    }
+
+    .mod-badge.discord {
+      background-color: rgba(114, 137, 218, 0.2);
+      color: #7289DA;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Attendance */
+    .attendance-card {
+      background-color: rgba(76, 175, 80, 0.1);
+      border: 1px solid rgba(76, 175, 80, 0.2);
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .streak-container {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .streak-day {
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      background-color: var(--success);
+    }
+
+    .streak-day.missed {
+      background-color: rgba(255, 255, 255, 0.3);
+    }
+
+    /* Activity Section */
+    .activity-section {
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .activity-item {
+      display: flex;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .activity-item:last-child {
+      border-bottom: none;
+    }
+
+    .activity-date {
+      flex: 0 0 120px;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    .activity-details {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .activity-icon {
+      color: var(--primary);
+    }
+
+    .activity-text {
+      font-weight: 500;
+    }
+
+    /* Action Buttons */
+    .action-buttons {
+      display: flex;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+
+    .action-btn {
+      padding: 0.75rem 1.5rem;
+      border-radius: 25px;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.3s ease;
+      border: none;
+    }
+
+    .action-btn i {
+      font-size: 1rem;
+    }
+
+    .btn-primary {
+      background-color: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background-color: var(--primary-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn-secondary {
+      background-color: var(--secondary);
+      color: white;
+    }
+
+    .btn-secondary:hover {
+      background-color: var(--secondary-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 992px) {
+      .profile-container {
+        flex-direction: column;
+      }
+
+      .avatar-section {
+        border-right: none;
+        border-bottom: 1px solid var(--border-color);
+      }
+
+      .details-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .header-container {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+      }
+
+      .user-info {
+        width: 100%;
+        justify-content: space-between;
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .action-buttons {
+        flex-direction: column;
+      }
+
+      .action-btn {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .logo {
+        font-size: 1.25rem;
+      }
+
+      .user-email, .session-timer, .logout-btn {
+        font-size: 0.8rem;
+        padding: 0.4rem 0.8rem;
+      }
+
+      .avatar-section {
+        padding: 1.5rem;
+      }
+
+      .avatar-wrapper {
+        width: 120px;
+        height: 120px;
+      }
+
+      .user-name {
+        font-size: 1.5rem;
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-container">
+      <a href="#" class="logo">
+        <i class="fas fa-tv"></i>
+        <span class="logo-text">AKAXORZO</span>
+      </a>
+      <div class="user-info">
+        <span class="user-email" id="user-email">
+          <i class="fas fa-user-circle"></i>
+          <span>akax@gmail.com</span>
+        </span>
+        <span class="session-timer" id="session-timer">
+          <i class="fas fa-clock"></i>
+          <span>5:00</span>
+        </span>
+        <button class="logout-btn" id="logout-btn">
+          <i class="fas fa-sign-out-alt"></i>
+          <span>Logout</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="profile-container">
+      <!-- Avatar Section -->
+      <div class="avatar-section">
+        <div class="avatar-wrapper">
+          <img src="Images/Akax.png" alt="Akaxorzo" class="avatar">
+          <div class="avatar-status"></div>
+        </div>
+        <h1 class="user-name">Akaxorzo</h1>
+        <div class="user-role">
+          <i class="fas fa-crown"></i>
+          <span>Owner / Creator</span>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-grid">
+          <div class="stat-item">
+            <div class="stat-value">9.1K</div>
+            <div class="stat-label">Subscribers</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value">1.1k</div>
+            <div class="stat-label">Videos</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value">828</div>
+            <div class="stat-label">Discord Members</div>
+          </div>
+        </div>
+
+        <!-- Welcome GIF -->
+        <div class="welcome-gif">
+          <img src="Images/Welcome.png" alt="Welcome">
+        </div>
+      </div>
+
+      <!-- Details Section -->
+      <div class="details-section">
+        <div class="section-header">
+          <h2 class="section-title">
+            <i class="fas fa-id-card"></i>
+            <span>Akaxorzo Family ID</span>
+          </h2>
+          <p class="section-subtitle">User information and moderation status</p>
+        </div>
+
+        <div class="details-grid">
+          <!-- Column 1 -->
+          <div class="detail-card">
+            <div class="detail-icon">
+              <i class="fas fa-user"></i>
+            </div>
+            <div class="detail-content">
+              <div class="detail-label">Username</div>
+              <div class="detail-value">
+                <i class="fas fa-check-circle status-indicator"></i>
+                <span>Akax26</span>
+                <span class="badge verified">
+                  <i class="fas fa-shield-alt"></i>
+                  <span>Verified</span>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="detail-card">
+            <div class="detail-icon">
+              <i class="fab fa-youtube"></i>
+            </div>
+            <div class="detail-content">
+              <div class="detail-label">YouTube Username</div>
+              <div class="detail-value">
+                <i class="fas fa-check-circle status-indicator"></i>
+                <span>Akaxorzo</span>
+                <span class="badge creator">
+                  <i class="fab fa-youtube"></i>
+                  <span>Creator</span>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="detail-card">
+            <div class="detail-icon">
+              <i class="fab fa-discord"></i>
+            </div>
+            <div class="detail-content">
+              <div class="detail-label">Discord Username</div>
+              <div class="detail-value">
+                <i class="fas fa-check-circle status-indicator"></i>
+                <span>Akaxorzo</span>
+                <span class="badge member">
+                  <i class="fab fa-discord"></i>
+                  <span>Member</span>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="detail-card">
+            <div class="detail-icon">
+              <i class="fas fa-crown"></i>
+            </div>
+            <div class="detail-content">
+              <div class="detail-label">YouTube Owner</div>
+              <div class="detail-value">
+                <i class="fas fa-check-circle status-indicator"></i>
+                <span>True</span>
+                <span class="mod-badge youtube">
+                  <i class="fas fa-shield-alt"></i>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Column 2 -->
+          <div class="detail-card">
+            <div class="detail-icon">
+              <i class="fas fa-crown"></i>
+            </div>
+            <div class="detail-content">
+              <div class="detail-label">Discord Owner</div>
+              <div class="detail-value">
+                <i class="fas fa-check-circle status-indicator"></i>
+                <span>True</span>
+                <span class="mod-badge discord">
+                  <i class="fas fa-shield-alt"></i>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="detail-card">
+            <div class="detail-icon">
+              <i class="fas fa-birthday-cake"></i>
+            </div>
+            <div class="detail-content">
+              <div class="detail-label">Birthday</div>
+              <div class="detail-value">
+                <i class="fas fa-check-circle status-indicator"></i>
+                <span>March 18</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Attendance Card -->
+          <div class="detail-card attendance-card">
+            <div class="detail-icon">
+              <i class="fas fa-calendar-check"></i>
+            </div>
+            <div class="detail-content">
+              <div class="detail-label">Stream Attendance</div>
+              <div class="detail-value">
+                <i class="fas fa-fire status-indicator"></i>
+                <span>1 Day Streak</span>
+              </div>
+              <div class="streak-container">
+                <div class="streak-day"></div>
+                <div class="streak-day"></div>
+                <div class="streak-day"></div>
+                <div class="streak-day"></div>
+                <div class="streak-day"></div>
+                <div class="streak-day"></div>
+                <div class="streak-day"></div>
+                <div class="streak-day missed"></div>
+                <div class="streak-day"></div>
+                <div class="streak-day"></div>
+                <div class="streak-day"></div>
+                <div class="streak-day"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="detail-card">
+            <div class="detail-icon">
+              <i class="fas fa-clock"></i>
+            </div>
+            <div class="detail-content">
+              <div class="detail-label">Last Stream Attended</div>
+              <div class="detail-value">
+                <i class="fas fa-check-circle status-indicator"></i>
+                <span>May 17, 2025</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Activity Section -->
+        <div class="activity-section">
+          <h3 class="section-title">
+            <i class="fas fa-history"></i>
+            <span>Recent Stream Activity</span>
+          </h3>
+          
+          <div class="activity-item">
+            <div class="activity-date">May 17, 2025</div>
+            <div class="activity-details">
+              <i class="fas fa-gamepad activity-icon"></i>
+              <span class="activity-text">Game Stream: Roblox MM2 Live</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+          <button class="action-btn btn-primary" onclick="window.location.href='mod.html'">
+            <i class="fas fa-user-shield"></i>
+            <span>Apply for Mod</span>
+          </button>
+          <button class="action-btn btn-secondary">
+            <i class="fas fa-edit"></i>
+            <span>Update User Data</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Page Protection Script -->
+  <script src="securepages.js"></script>
+
+  <!-- Auto Logout Script -->
   <script>
     // Auto logout configuration
     const AUTO_LOGOUT_TIME = 5 * 60 * 1000; // 5 minutes in milliseconds
     let autoLogoutTimer;
-    let lastActivityTime = new Date().getTime(); // Track last activity time
-    
+    let lastActivityTime = new Date().getTime();
+
     document.addEventListener('DOMContentLoaded', function() {
       // Hide the entire body content initially
       document.body.style.visibility = 'hidden';
@@ -100,7 +936,7 @@
         startAutoLogoutTimer();
       }, 500);
     });
-    
+
     // Function to reset the auto logout timer
     function resetAutoLogoutTimer() {
       // Update last activity time
@@ -149,15 +985,13 @@
       const seconds = Math.floor((timeRemaining % 60000) / 1000);
       
       // Update the timer display
-      sessionTimerElement.innerHTML = `<i class="fas fa-clock" style="margin-right: 5px;"></i>${minutes}:${seconds.toString().padStart(2, '0')}`;
+      sessionTimerElement.innerHTML = `<i class="fas fa-clock"></i> <span>${minutes}:${seconds.toString().padStart(2, '0')}</span>`;
       
       // Change color based on time remaining
       if (timeRemaining < 60000) { // Less than 1 minute
-        sessionTimerElement.style.backgroundColor = '#f44336'; // Red
-        sessionTimerElement.style.color = 'white';
+        sessionTimerElement.classList.add('warning');
       } else {
-        sessionTimerElement.style.backgroundColor = '#2d2d2d'; // Default color
-        sessionTimerElement.style.color = '#f1f1f1';
+        sessionTimerElement.classList.remove('warning');
       }
     }
     
@@ -217,1145 +1051,31 @@
       console.log('Redirecting to login page...');
       window.location.href = 'index.html';
     }
-  </script>
-  
-  <!-- User Profile CSS -->
-  <style>
-    /* Base styles */
-    body {
-      font-family: 'Poppins', sans-serif;
-      background-color: #0a0a0a;
-      color: #f5f5f5;
-      margin: 0;
-      padding: 0;
-      min-height: 100vh;
-      background-image: linear-gradient(to bottom, #0a0a0a, #121212, #0a0a0a);
-    }
-     @media (max-width: 992px) {
-      .user-profile-container {
-        flex-direction: column;
-      }
-      
-      .user-avatar-section {
-        flex: 0 0 auto;
-        border-right: none;
-        border-bottom: 1px solid #333;
-        padding-bottom: 30px;
-      }
-      
-      .user-details-content {
-        grid-template-columns: 1fr;
-      }
-    }
-    
-    @media (max-width: 768px) {
-      .main-content {
-        padding: 15px;
-      }
-      
-      .header {
-        padding: 10px 0;
-      }
-      
-      nav {
-        padding: 0 10px;
-      }
-      
-      .logo {
-        font-size: 18px;
-      }
-      
-      .user-info {
-        flex-wrap: wrap;
-        justify-content: flex-end;
-      }
-      
-      #user-email {
-        font-size: 12px;
-        padding: 4px 8px;
-        margin-right: 8px;
-      }
-      
-      #session-timer {
-        font-size: 12px;
-        padding: 4px 8px;
-        margin: 0 8px 0 0;
-      }
-      
-      .btn {
-        padding: 6px 12px;
-        font-size: 12px;
-      }
-      
-      .user-stats {
-        flex-wrap: wrap;
-      }
-      
-      .user-stat-item {
-        flex: 0 0 50%;
-        margin-bottom: 15px;
-      }
-      
-      .activity-item {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-      
-      .activity-date {
-        margin-bottom: 5px;
-      }
-      
-      .user-actions {
-        flex-direction: column;
-      }
-      
-      .user-action-btn {
-        width: 100%;
-      }
-      
-      .user-avatar-section {
-        padding: 25px 15px;
-      }
-      
-      .user-avatar {
-        width: 120px;
-        height: 120px;
-      }
-      
-      .user-avatar-section h3 {
-        font-size: 20px;
-      }
-      
-      .user-role {
-        font-size: 14px;
-      }
-      
-      .user-details-section {
-        padding: 25px 15px;
-      }
-      
-      .user-details-header h2 {
-        font-size: 22px;
-      }
-      
-      .user-details-header p {
-        font-size: 14px;
-      }
-      
-      .user-details-item {
-        padding: 10px;
-      }
-      
-      .item-icon {
-        width: 32px;
-        height: 32px;
-        font-size: 14px;
-      }
-      
-      .user-details-value {
-        font-size: 14px;
-      }
-      
-      .badge {
-        font-size: 10px;
-        padding: 2px 6px;
-      }
-    }
-    
-    /* Small phone screens */
-    @media (max-width: 480px) {
-      .header {
-        padding: 8px 0;
-      }
-      
-      .logo {
-        font-size: 16px;
-      }
-      
-      .user-info {
-        margin-top: 8px;
-        justify-content: flex-end;
-        width: 100%;
-      }
-      
-      nav {
-        flex-wrap: wrap;
-      }
-      
-      #user-email, #session-timer {
-        margin-bottom: 8px;
-      }
-      
-      .user-avatar {
-        width: 100px;
-        height: 100px;
-      }
-      
-      .user-stat-value {
-        font-size: 16px;
-      }
-      
-      .user-stat-label {
-        font-size: 10px;
-      }
-      
-      .user-avatar-section h3 {
-        font-size: 18px;
-      }
-      
-      .user-role {
-        font-size: 12px;
-      }
-      
-      .user-details-header h2 {
-        font-size: 18px;
-      }
-      
-      .user-details-header p {
-        font-size: 12px;
-      }
-    }
-    /* Header styles */
-    .header {
-      background-color: rgba(20, 20, 20, 0.95);
-      padding: 15px 0;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.3);
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    }
-    
-    nav {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 20px;
-    }
-    
-    .logo {
-      font-family: 'Montserrat', sans-serif;
-      font-weight: 700;
-      font-size: 22px;
-      color: #ffffff;
-      letter-spacing: 1px;
-      display: flex;
-      align-items: center;
-    }
-    
-    .logo i {
-      margin-right: 10px;
-      color: #5C6BC0;
-    }
-    
-    .user-info {
-      display: flex;
-      align-items: center;
-    }
-    
-    #user-email {
-      margin-right: 15px;
-      font-family: 'Poppins', sans-serif;
-      color: #e0e0e0;
-      background-color: rgba(255, 255, 255, 0.05);
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-size: 14px;
-    }
-    
-    #session-timer {
-      margin: 0 15px;
-      padding: 6px 12px;
-      background-color: #2d2d2d;
-      border-radius: 20px;
-      font-size: 14px;
-      transition: all 0.3s ease;
-    }
-    
-    .btn {
-      padding: 8px 16px;
-      background-color: #f44336;
-      color: white;
-      border: none;
-      border-radius: 20px;
-      cursor: pointer;
-      font-family: 'Poppins', sans-serif;
-      font-size: 14px;
-      font-weight: 500;
-      transition: all 0.3s ease;
-      display: flex;
-      align-items: center;
-    }
-    
-    .btn i {
-      margin-right: 6px;
-    }
-    
-    .btn:hover {
-      background-color: #d32f2f;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    }
-    
-    /* Main content container */
-    .main-content {
-      padding: 30px;
-      max-width: 1200px;
-      margin: 0 auto;
-      animation: fadeIn 0.5s ease;
-    }
-    
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    
-    /* User profile section */
-    .user-profile-container {
-      display: flex;
-      background-color: rgba(30, 30, 30, 0.8);
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
-      margin-bottom: 30px;
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      transition: all 0.3s ease;
-    }
-    
-    .user-profile-container:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
-    }
-    
-    /* User avatar section */
-    .user-avatar-section {
-      flex: 0 0 280px;
-      padding: 40px 30px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      background-color: rgba(36, 36, 36, 0.8);
-      border-right: 1px solid #333;
-      position: relative;
-      overflow: hidden;
-    }
-    
-    .user-avatar-section::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: linear-gradient(135deg, rgba(92, 107, 192, 0.1), rgba(66, 66, 66, 0));
-      z-index: 0;
-    }
-    
-    .user-avatar {
-      width: 180px;
-      height: 180px;
-      border-radius: 50%;
-      overflow: hidden;
-      margin-bottom: 25px;
-      border: 4px solid #5C6BC0;
-      background-color: #333;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      position: relative;
-      z-index: 1;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-    }
-    
-    .user-avatar img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      transition: transform 0.5s ease;
-    }
-    
-    .user-avatar:hover img {
-      transform: scale(1.05);
-    }
-    
-    .user-avatar .avatar-placeholder {
-      font-size: 80px;
-      color: #555;
-    }
-    
-    .avatar-status {
-      position: absolute;
-      bottom: 10px;
-      right: 10px;
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      background-color: #4CAF50;
-      border: 3px solid #242424;
-      z-index: 2;
-    }
-    
-    .user-avatar-section h3 {
-      color: #ffffff;
-      margin-top: 15px;
-      margin-bottom: 8px;
-      font-family: 'Montserrat', sans-serif;
-      font-size: 24px;
-      font-weight: 700;
-      position: relative;
-      z-index: 1;
-    }
-    
-    .user-role {
-      color: #5C6BC0;
-      font-size: 16px;
-      font-weight: 500;
-      position: relative;
-      z-index: 1;
-      background-color: rgba(92, 107, 192, 0.1);
-      padding: 5px 15px;
-      border-radius: 20px;
-      margin-top: 5px;
-      display: flex;
-      align-items: center;
-    }
-    
-    .user-role i {
-      margin-right: 8px;
-    }
-    
-    .user-stats {
-      display: flex;
-      justify-content: space-between;
-      width: 100%;
-      margin-top: 25px;
-      padding-top: 20px;
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
-      position: relative;
-      z-index: 1;
-    }
-    
-    .user-stat-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      flex: 1;
-    }
-    
-    .user-stat-value {
-      font-size: 20px;
-      font-weight: 700;
-      color: #ffffff;
-      margin-bottom: 5px;
-    }
-    
-    .user-stat-label {
-      font-size: 12px;
-      color: #9e9e9e;
-      text-align: center;
-    }
-    
-    /* User details section */
-    .user-details-section {
-      flex: 1;
-      padding: 40px;
-      position: relative;
-    }
-    
-    .user-details-header {
-      margin-bottom: 30px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-      padding-bottom: 20px;
-    }
-    
-    .user-details-header h2 {
-      font-family: 'Montserrat', sans-serif;
-      font-size: 28px;
-      color: #ffffff;
-      margin-bottom: 10px;
-      display: flex;
-      align-items: center;
-    }
-    
-    .user-details-header h2 i {
-      margin-right: 12px;
-      color: #5C6BC0;
-    }
-    
-    .user-details-header p {
-      color: #9e9e9e;
-      font-size: 16px;
-    }
-    
-    .user-details-content {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      grid-gap: 30px;
-    }
-    
-    .user-details-item {
-      margin-bottom: 20px;
-      background-color: rgba(255, 255, 255, 0.03);
-      padding: 15px;
-      border-radius: 8px;
-      transition: all 0.3s ease;
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      display: flex;
-      align-items: center;
-    }
-    
-    .user-details-item:hover {
-      background-color: rgba(255, 255, 255, 0.05);
-      transform: translateY(-2px);
-    }
-    
-    .item-icon {
-      width: 40px;
-      height: 40px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 10px;
-      margin-right: 15px;
-      background-color: rgba(92, 107, 192, 0.15);
-      color: #5C6BC0;
-      font-size: 18px;
-    }
-    
-    .item-content {
-      flex: 1;
-    }
-    
-    .user-details-label {
-      font-family: 'Poppins', sans-serif;
-      font-size: 13px;
-      font-weight: 400;
-      color: #9e9e9e;
-      margin-bottom: 5px;
-    }
-    
-    .user-details-value {
-      font-family: 'Poppins', sans-serif;
-      font-size: 16px;
-      font-weight: 500;
-      color: #ffffff;
-      display: flex;
-      align-items: center;
-    }
-    
-    .status-indicator {
-      display: inline-flex;
-      align-items: center;
-      margin-right: 8px;
-    }
-    
-    .status-granted {
-      color: #4CAF50;
-    }
-    
-    .status-denied {
-      color: #F44336;
-    }
-    
-    .status-na {
-      color: #FFC107;
-    }
-    
-    .mod-badge {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 24px;
-      height: 24px;
-      background-color: rgba(255, 193, 7, 0.2);
-      border-radius: 50%;
-      margin-left: 10px;
-      animation: spin 4s linear infinite;
-    }
-    
-    .mod-badge.discord {
-      background-color: rgba(114, 137, 218, 0.2);
-      color: #7289DA;
-    }
-    
-    .mod-badge.youtube {
-      background-color: rgba(255, 193, 7, 0.2);
-      color: #FFC107;
-    }
-    
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-    
-    /* Attendance Tracking */
-    .attendance-tracking {
-      background-color: rgba(76, 175, 80, 0.1);
-      border: 1px solid rgba(76, 175, 80, 0.2);
-      border-radius: 8px;
-      padding: 15px;
-      margin-bottom: 20px;
-      display: flex;
-      align-items: center;
-    }
-    
-    .attendance-icon {
-      width: 40px;
-      height: 40px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 10px;
-      margin-right: 15px;
-      background-color: rgba(76, 175, 80, 0.15);
-      color: #4CAF50;
-      font-size: 18px;
-    }
-    
-    .attendance-streak {
-      display: flex;
-      align-items: center;
-      margin-top: 10px;
-    }
-    
-    .streak-day {
-      width: 15px;
-      height: 15px;
-      border-radius: 50%;
-      margin-right: 5px;
-      background-color: #4CAF50;
-    }
-    
-    .streak-day.missed {
-      background-color: rgba(255, 255, 255, 0.3);
-    }
-    
-    /* Buttons */
-    .user-actions {
-      margin-top: 35px;
-      display: flex;
-      gap: 15px;
-    }
-    
-    .user-action-btn {
-      padding: 12px 24px;
-      border: none;
-      border-radius: 25px;
-      font-family: 'Poppins', sans-serif;
-      font-size: 14px;
-      font-weight: 500;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      transition: all 0.3s ease;
-    }
-    
-    .user-action-btn i {
-      margin-right: 8px;
-    }
-    
-    .btn-primary {
-      background-color: #5C6BC0;
-      color: white;
-    }
-    
-    .btn-primary:hover {
-      background-color: #3F51B5;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    }
-    
-    .btn-secondary {
-      background-color: #4CAF50;
-      color: white;
-    }
-    
-    .btn-secondary:hover {
-      background-color: #388E3C;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    }
-    
-    /* Badge and icon styles */
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      background-color: rgba(76, 175, 80, 0.1);
-      color: #4CAF50;
-      padding: 3px 8px;
-      border-radius: 12px;
-      font-size: 12px;
-      margin-left: 10px;
-    }
-    
-    .badge i {
-      margin-right: 4px;
-    }
-    
-    .badge.youtube {
-      background-color: rgba(255, 0, 0, 0.1);
-      color: #ff0000;
-    }
-    
-    .badge.discord {
-      background-color: rgba(114, 137, 218, 0.1);
-      color: #7289DA;
-    }
-    
-    /* Activity graph */
-    .activity-graph {
-      margin-top: 30px;
-      padding-top: 20px;
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
-    }
-    
-    .activity-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 15px;
-    }
-    
-    .activity-header h3 {
-      font-family: 'Montserrat', sans-serif;
-      font-size: 18px;
-      color: #ffffff;
-      margin: 0;
-    }
-    
-    .stream-activity-container {
-      display: flex;
-      flex-direction: column;
-      margin-top: 20px;
-      background-color: rgba(255, 255, 255, 0.03);
-      border-radius: 8px;
-      padding: 20px;
-      border: 1px solid rgba(255, 255, 255, 0.05);
-    }
-    
-    .activity-item {
-      display: flex;
-      align-items: center;
-      padding: 10px 0;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    }
-    
-    .activity-item:last-child {
-      border-bottom: none;
-    }
-    
-    .activity-date {
-      font-size: 14px;
-      color: #9e9e9e;
-      flex: 0 0 120px;
-    }
-    
-    .activity-type {
-      font-size: 14px;
-      color: #ffffff;
-      flex: 1;
-      display: flex;
-      align-items: center;
-    }
-    
-    .activity-type i {
-      margin-right: 8px;
-      color: #5C6BC0;
-    }
-    
-    /* GIF display section */
-    .gif-container {
-      width: 100%;
-      margin-top: 20px;
-      overflow: hidden;
-      border-radius: 8px;
-      position: relative;
-    }
-    
-    .gif-container img {
-      width: 100%;
-      height: auto;
-      display: block;
-      border-radius: 8px;
-    }
-    
-    /* Responsive design */
-    @media (max-width: 992px) {
-      .user-profile-container {
-        flex-direction: column;
-      }
-      
-      .user-avatar-section {
-        flex: 0 0 auto;
-        border-right: none;
-        border-bottom: 1px solid #333;
-        padding-bottom: 30px;
-      }
-      
-      .user-details-content {
-        grid-template-columns: 1fr;
-      }
-    }
-    
-    @media (max-width: 768px) {
-      .user-stats {
-        flex-wrap: wrap;
-      }
-      
-      .user-stat-item {
-        flex: 0 0 50%;
-        margin-bottom: 15px;
-      }
-      
-      .activity-item {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-      
-      .activity-date {
-        margin-bottom: 5px;
-      }
-      
-      .user-actions {
-        flex-direction: column;
-      }
-      
-      .user-action-btn {
-        width: 100%;
-      }
-    }
-  </style>
-</head>
-<body>
-  <header class="header">
-    <nav>
-      <div class="logo">
-        <i class="fas fa-tv"></i>
-        AKAXORZO DASHBOARD
-      </div>
-      <div class="user-info">
-        <span id="user-email"><i class="fas fa-user-circle"></i> akax@gmail.com</span>
-        <span id="session-timer">
-          <i class="fas fa-clock"></i> 5:00
-        </span>
-        <button id="logout-btn" class="btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
-      </div>
-    </nav>
-  </header>
 
-  <div class="main-content">
-    <div class="user-profile-container">
-      <!-- User Avatar Section -->
-      <div class="user-avatar-section">
-        <div class="user-avatar">
-          <img src="Images/Akax.png" alt="User Profile" />
-          <div class="avatar-status"></div>
-        </div>
-        <h3>Akaxorzo</h3>
-        <div class="user-role">
-          <i class="fas fa-crown"></i> Owner / Creator
-        </div>
+    // Mobile responsive adjustments
+    document.addEventListener('DOMContentLoaded', function() {
+      // Handle mobile nav view
+      if (window.innerWidth <= 480) {
+        // Adjust layout for very small screens
+        const userInfo = document.querySelector('.user-info');
+        const headerContainer = document.querySelector('.header-container');
         
-        <div class="user-stats">
-          <div class="user-stat-item">
-            <div class="user-stat-value">9.1K</div>
-            <div class="user-stat-label">Subscribers</div>
-          </div>
-          <div class="user-stat-item">
-            <div class="user-stat-value">1.1k</div>
-            <div class="user-stat-label">Videos</div>
-          </div>
-          <div class="user-stat-item">
-            <div class="user-stat-value">828</div>
-            <div class="user-stat-label">Discord Members</div>
-          </div>
-        </div>
-        
-        <div class="gif-container" style="margin-top: 25px;">
-          <img src="Images/Welcome.png" alt="Welcome GIF" />
-        </div>
-      </div>
-      
-      <!-- User Details Section -->
-      <div class="user-details-section">
-        <div class="user-details-header">
-          <h2><i class="fas fa-id-card"></i> Akaxorzo Family ID</h2>
-          <p>User information and moderation status</p>
-        </div>
-        
-        <div class="user-details-content">
-          <!-- First column -->
-          <div>
-            <div class="user-details-item">
-              <div class="item-icon">
-                <i class="fas fa-user"></i>
-              </div>
-              <div class="item-content">
-                <div class="user-details-label">Username</div>
-                <div class="user-details-value">
-                  <span class="status-indicator">
-                    <i class="fas fa-check-circle status-granted"></i>
-                  </span>
-                  Akax26
-                  <span class="badge"><i class="fas fa-shield-alt"></i> Verified</span>
-                </div>
-              </div>
-            </div>
-            
-            <div class="user-details-item">
-              <div class="item-icon">
-                <i class="fab fa-youtube"></i>
-              </div>
-              <div class="item-content">
-                <div class="user-details-label">YouTube Username</div>
-                <div class="user-details-value">
-                  <span class="status-indicator">
-                    <i class="fas fa-check-circle status-granted"></i>
-                  </span>
-                  Akaxorzo
-                  <span class="badge youtube"><i class="fab fa-youtube"></i> Creator</span>
-                </div>
-              </div>
-            </div>
-            
-            <div class="user-details-item">
-              <div class="item-icon">
-                <i class="fab fa-discord"></i>
-              </div>
-              <div class="item-content">
-                <div class="user-details-label">Discord Username</div>
-                <div class="user-details-value">
-                  <span class="status-indicator">
-                    <i class="fas fa-check-circle status-granted"></i>
-                  </span>
-                  Akaxorzo
-                  <span class="badge discord"><i class="fab fa-discord"></i> Member</span>
-                </div>
-              </div>
-            </div>
-            
-            <div class="user-details-item">
-              <div class="item-icon">
-                <i class="fas fa-crown"></i>
-              </div>
-              <div class="item-content">
-                <div class="user-details-label">YouTube Owner</div>
-                <div class="user-details-value">
-                  <span class="status-indicator">
-                    <i class="fas fa-check-circle status-granted"></i>
-                  </span>
-                  True
-                  <span class="mod-badge youtube">
-                    <i class="fas fa-shield-alt"></i>
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <!-- Second column -->
-          <div>
-            <div class="user-details-item">
-              <div class="item-icon">
-                <i class="fas fa-crown"></i>
-              </div>
-              <div class="item-content">
-                <div class="user-details-label">Discord Owner</div>
-                <div class="user-details-value">
-                  <span class="status-indicator">
-                    <i class="fas fa-check-circle status-granted"></i>
-                  </span>
-                  True
-                  <span class="mod-badge discord">
-                    <i class="fas fa-shield-alt"></i>
-                  </span>
-                </div>
-              </div>
-            </div>
-            
-            <div class="user-details-item">
-              <div class="item-icon">
-                <i class="fas fa-birthday-cake"></i>
-              </div>
-              <div class="item-content">
-                <div class="user-details-label">Birthday</div>
-                <div class="user-details-value">
-                  <span class="status-indicator">
-                    <i class="fas fa-check-circle status-granted"></i>
-                  </span>
-                  March 18
-                </div>
-              </div>
-            </div>
-            
-            <!-- New Attendance Tracking -->
-            <div class="user-details-item">
-              <div class="item-icon">
-                <i class="fas fa-calendar-check"></i>
-              </div>
-              <div class="item-content">
-                <div class="user-details-label">Stream Attendance</div>
-                <div class="user-details-value">
-                  <span class="status-indicator">
-                    <i class="fas fa-fire status-granted"></i>
-                  </span>
-                  1 Day Streak
-                </div>
-                <div class="attendance-streak">
-                  <div class="streak-day"></div>
-                  <div class="streak-day"></div>
-                  <div class="streak-day"></div>
-                  <div class="streak-day"></div>
-                  <div class="streak-day"></div>
-                  <div class="streak-day"></div>
-                  <div class="streak-day"></div>
-                  <div class="streak-day missed"></div>
-                  <div class="streak-day"></div>
-                  <div class="streak-day"></div>
-                  <div class="streak-day"></div>
-                  <div class="streak-day"></div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="user-details-item">
-              <div class="item-icon">
-                <i class="fas fa-clock"></i>
-              </div>
-              <div class="item-content">
-                <div class="user-details-label">Last Stream Attended</div>
-                <div class="user-details-value">
-                  <span class="status-indicator">
-                    <i class="fas fa-check-circle status-granted"></i>
-                  </span>
-                  May 17, 2025
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <!-- Stream Activity Tracking -->
-        <div class="stream-activity-container">
-          <div class="activity-header">
-            <h3><i class="fas fa-history"></i> Recent Stream Activity</h3>
-          </div>
-          
-          <div class="activity-item">
-            <div class="activity-date">May 17, 2025</div>
-            <div class="activity-type">
-              <i class="fas fa-gamepad"></i> Game Stream: Roblox MM2 Live
-              
-            </div>
-          </div>
-          
-          <!-- <div class="activity-item">
-            <div class="activity-date">May 14, 2025</div>
-            <div class="activity-type">
-              <i class="fas fa-microphone"></i> Podcast: Gaming Industry News
-              <span class="badge"><i class="fas fa-heart"></i> Donated</span>
-              <span class="badge"><i class="fas fa-comments"></i> Active Chat</span>
-            </div>
-          </div>
-          
-          <div class="activity-item">
-            <div class="activity-date">May 12, 2025</div>
-            <div class="activity-type">
-              <i class="fas fa-gamepad"></i> Game Stream: Fortnite Tournament
-              <span class="badge"><i class="fas fa-trophy"></i> Won Giveaway</span>
-            </div>
-          </div>
-          
-          <div class="activity-item">
-            <div class="activity-date">May 10, 2025</div>
-            <div class="activity-type">
-              <i class="fas fa-users"></i> Community Day: Q&A Session
-              <span class="badge"><i class="fas fa-star"></i> Moderator</span>
-            </div>
-          </div> /*
-          
-          <div class="gif-container" style="margin-top: 20px;">
-            <img src="/api/placeholder/600/150" alt="Activity Statistics" />
-          </div>
-        </div> -->
-        
-        <!-- Action buttons -->
-        <div class="user-actions">
-          <button class="user-action-btn btn-primary" onclick="window.location.href='mod.html'">
-            <i class="fas fa-user-shield"></i> Apply for Mod
-          </button>
-          <button class="user-action-btn btn-secondary">
-            <i class="fas fa-edit"></i> Update User Data
-          </button>
-        </div>
-        
-        <!-- Animated GIF -->
-       
-      </div>
-    </div>
-    
-    <!-- Additional JavaScript for attendance tracking -->
-    <script>
-      // Sample data for demonstration purposes
-      const attendanceData = {
-        lastAttended: "May 17, 2025",
-        streak: 1,
-        streakDays: [true],
-        recentActivity: [
-          { date: "May 17, 2025", type: "EVENT", details: "MM2 BOYS VS GIRLS", badges: [] },
-        ]
-      };
-      
-      // Update streak days based on data
-      function updateStreakDisplay() {
-        const streakContainer = document.querySelector('.attendance-streak');
-        if (!streakContainer) return;
-        
-        streakContainer.innerHTML = '';
-        
-        attendanceData.streakDays.forEach(day => {
-          const dayElement = document.createElement('div');
-          dayElement.className = day ? 'streak-day' : 'streak-day missed';
-          streakContainer.appendChild(dayElement);
-        });
+        if (userInfo && headerContainer) {
+          headerContainer.style.flexDirection = 'column';
+          headerContainer.style.alignItems = 'flex-start';
+          userInfo.style.marginTop = '10px';
+          userInfo.style.justifyContent = 'space-between';
+          userInfo.style.width = '100%';
+        }
       }
       
-      // Call this when the page loads
-      document.addEventListener('DOMContentLoaded', function() {
-        updateStreakDisplay();
-      });
-    </script>
-  </div>
-  <script src="securepages.js"></script>
-    <script>
-  // Force initial scaling for mobile
-  document.addEventListener('DOMContentLoaded', function() {
-    // Handle mobile nav view
-    if (window.innerWidth <= 480) {
-      // Adjust layout for very small screens
-      const userInfo = document.querySelector('.user-info');
-      const nav = document.querySelector('nav');
-      
-      if (userInfo && nav) {
-        nav.style.flexDirection = 'column';
-        nav.style.alignItems = 'flex-start';
-        userInfo.style.marginTop = '10px';
-        userInfo.style.justifyContent = 'space-between';
-        userInfo.style.width = '100%';
-      }
-    }
-    
-    // Prevent zoom on inputs for iOS devices
-    document.addEventListener('touchstart', function(event) {
-      if (event.target.tagName === 'INPUT' || event.target.tagName === 'SELECT' || event.target.tagName === 'TEXTAREA') {
-        event.target.style.fontSize = '16px';
-      }
-    }, false);
-  });
-</script>
+      // Prevent zoom on inputs for iOS devices
+      document.addEventListener('touchstart', function(event) {
+        if (event.target.tagName === 'INPUT' || event.target.tagName === 'SELECT' || event.target.tagName === 'TEXTAREA') {
+          event.target.style.fontSize = '16px';
+        }
+      }, false);
+    });
+  </script>
 </body>
 </html>
