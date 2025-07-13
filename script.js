@@ -96,8 +96,8 @@ document.addEventListener('DOMContentLoaded', function() {
   document.querySelectorAll('.social-icon').forEach((icon, index) => {
     icon.addEventListener('click', () => {
       const links = [
-        'https://twitch.tv/youraccount',
-        'https://twitter.com/youraccount'
+        'https://twitch.tv/akaxorzo',
+        'https://twitter.com/akaxorzo'
       ];
       console.log(`Social icon ${index} clicked`);
       window.open(links[index], '_blank');
